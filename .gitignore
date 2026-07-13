@@ -1,0 +1,14 @@
+node_modules
+dist
+.DS_Store
+*.local
+.playwright-cli/
+public/preview-behind-president.png
+public/preview-ceiling-view.png
+public/preview-ceiling.png
+public/preview-from-tribune.png
+public/preview-seats-side.png
+public/preview-tribune-close.png
+public/preview-vault-side.png
+public/preview-wallart-bottom.png
+public/preview-wallart-new.png

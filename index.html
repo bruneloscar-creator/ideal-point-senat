@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hémicycle du Sénat — Maquette 3D</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="ui">
+      <header>
+        <p class="eyebrow">Palais du Luxembourg</p>
+        <h1>Hémicycle du Sénat</h1>
+        <p class="hint">348 sièges · Glisser pour tourner · Molette pour zoomer</p>
+      </header>
+      <div class="controls">
+        <button type="button" id="btn-reset" title="Réinitialiser la caméra">Réinitialiser</button>
+        <button type="button" id="btn-orbit" title="Vue orbitale lente">Orbit auto</button>
+      </div>
+    </div>
+    <canvas id="c"></canvas>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
