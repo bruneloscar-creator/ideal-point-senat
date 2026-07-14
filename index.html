@@ -2,20 +2,164 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hémicycle du Sénat — Maquette 3D</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#260711" />
+    <meta
+      name="description"
+      content="Explorez les positions de vote des 348 sénateurs dans une maquette 3D de l’hémicycle, estimées par un modèle Ideal Point."
+    />
+    <meta property="og:title" content="Ideal Point Sénat — Hémicycle 3D" />
+    <meta property="og:description" content="348 sénateurs · 3 558 scrutins · Une cartographie 3D des positions de vote." />
+    <meta property="og:image" content="/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="/og.png" />
+    <title>Ideal Point Sénat — Hémicycle 3D</title>
+    <script>
+      if (new URLSearchParams(window.location.search).get('background') === '1') {
+        document.documentElement.classList.add('background-mode');
+      }
+    </script>
     <link rel="stylesheet" href="/src/style.css" />
+    <link rel="stylesheet" href="/src/liquid.css" />
+    <link rel="stylesheet" href="/src/apple.css" />
   </head>
-  <body>
+  <body class="scene-page">
+    <div id="lang-switch" class="lang-switch" data-lang-host></div>
+    <div class="app-atmosphere" aria-hidden="true">
+      <span class="app-grid"></span>
+    </div>
+    <div id="intro" class="intro" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+      <div class="intro-backdrop" aria-hidden="true"></div>
+      <div class="intro-card">
+        <div class="intro-copy">
+          <div class="intro-brand">
+            <span data-i18n="intro.brand">Ideal Point · Sénat</span>
+          </div>
+          <p class="intro-eyebrow"><span class="live-dot"></span> <span data-i18n="intro.eyebrow">Modèle Ideal Point · Votes publics</span></p>
+          <h1 id="intro-title" class="intro-title" data-i18n-html="intro.title">Visualisation<br /><em>Sénat</em></h1>
+          <p class="intro-pitch" data-i18n-html="intro.pitch">
+            Un modèle entraîné sur 698&nbsp;455 votes publics estime en 2D la position
+            idéologique révélée de chaque sénateur.
+          </p>
+          <p class="intro-guidance">
+            <span aria-hidden="true">01</span>
+            <strong data-i18n="intro.guidanceStrong">Les sièges suivent les votes, pas les groupes</strong>
+            <small data-i18n="intro.guidanceSmall">Dans cet hémicycle, les sénateurs sont placés par proximité de vote — pas à leur place officielle.</small>
+          </p>
+          <p class="intro-axis" aria-hidden="true">
+            <span data-i18n="intro.axisLeft">Gauche</span>
+            <span class="intro-axis-line"><i></i></span>
+            <span data-i18n="intro.axisRight">Droite</span>
+          </p>
+          <div class="intro-stats" data-i18n-aria="intro.statsLabel" aria-label="Chiffres clés">
+            <div><strong>348</strong><span data-i18n="intro.statSenators">sénateurs</span></div>
+            <div><strong>3 558</strong><span data-i18n="intro.statVotes">scrutins retenus</span></div>
+            <div><strong>2D</strong><span data-i18n="intro.statDims">positions estimées</span></div>
+          </div>
+          <div class="intro-actions">
+            <button type="button" id="intro-enter" class="intro-cta" data-i18n-html="intro.enter">
+              Explorer l’hémicycle des votes <span aria-hidden="true">↗</span>
+            </button>
+            <button type="button" id="intro-skip" class="intro-skip" data-i18n="intro.skip">Accès direct</button>
+          </div>
+          <a class="intro-about" href="/about.html" data-i18n-html="intro.about">Découvrir la méthode <span aria-hidden="true">→</span></a>
+        </div>
+        <figure class="intro-ideal is-loading">
+          <div class="intro-ideal-head">
+            <span data-i18n="intro.idealHead">Idéologie révélée par les votes</span>
+            <span class="model-status"><i></i> <span data-i18n="intro.modelStatus">Modèle entraîné</span></span>
+          </div>
+          <canvas
+            id="intro-ideal-scatter"
+            width="480"
+            height="280"
+            role="img"
+            data-i18n-aria="intro.scatterAria"
+            aria-label="Projection en 2D des positions de vote estimées des sénateurs"
+          ></canvas>
+          <span class="intro-ideal-loading" data-i18n="intro.loading">Chargement de la projection…</span>
+          <figcaption class="intro-ideal-caption">
+            <span data-i18n="intro.captionX">Position estimée · gauche ↔ droite</span>
+            <span data-i18n="intro.captionTerm">Mandature 2023—2026</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
     <div id="ui">
       <header>
-        <p class="eyebrow">Palais du Luxembourg</p>
-        <h1>Hémicycle du Sénat</h1>
-        <p class="hint">348 sièges · Glisser pour tourner · Molette pour zoomer</p>
+        <div class="header-brand">
+          <div>
+            <p class="eyebrow" data-i18n="header.eyebrow">Visualisation politique · 2023—2026</p>
+            <h1 data-i18n-html="header.title">Ideal Point <span>Sénat</span></h1>
+          </div>
+        </div>
+        <div class="header-meta">
+          <span><i class="live-dot"></i> <span data-i18n="header.metaLive">Modèle actif</span></span>
+          <span data-i18n="header.metaSeats">348 sièges</span>
+          <span data-i18n="header.metaDims">2 dimensions</span>
+        </div>
+        <p class="hint" data-i18n="header.hint" data-hint-mode="default">Survolez un siège · cliquez pour analyser · glissez pour explorer</p>
+        <div class="senator-search" id="senator-search">
+          <label class="senator-search-label" for="senator-search-input" data-i18n="search.label">Rechercher un sénateur</label>
+          <input
+            type="search"
+            id="senator-search-input"
+            class="senator-search-input"
+            data-i18n-placeholder="search.placeholder"
+            placeholder="Nom ou département…"
+            autocomplete="off"
+            spellcheck="false"
+            enterkeyhint="search"
+            aria-autocomplete="list"
+            aria-controls="senator-search-results"
+            aria-expanded="false"
+          />
+          <ul
+            id="senator-search-results"
+            class="senator-search-results"
+            role="listbox"
+            hidden
+          ></ul>
+        </div>
+        <a class="about-link" href="/about.html" data-i18n-html="header.about">À propos <span aria-hidden="true">↗</span></a>
       </header>
       <div class="controls">
-        <button type="button" id="btn-reset" title="Réinitialiser la caméra">Réinitialiser</button>
-        <button type="button" id="btn-orbit" title="Vue orbitale lente">Orbit auto</button>
+        <span class="controls-label" data-i18n="controls.label">Caméra</span>
+        <button type="button" id="btn-reset" data-i18n-title="controls.resetTitle" data-i18n-html="controls.reset" title="Réinitialiser la caméra"><i aria-hidden="true">⌂</i> Vue globale</button>
+        <button type="button" id="btn-orbit" data-i18n-title="controls.orbitTitle" data-i18n-html="controls.orbit" title="Vue depuis les bancs, vers la tribune"><i aria-hidden="true">◉</i> Orbite guidée</button>
+      </div>
+    </div>
+    <div id="tooltip" class="tooltip" hidden>
+      <span class="tooltip-name"></span>
+      <span class="tooltip-party"></span>
+    </div>
+    <aside id="panel" class="panel" hidden aria-live="polite">
+      <button type="button" id="panel-close" class="panel-close" data-i18n-aria="panel.close" aria-label="Fermer">×</button>
+      <p class="panel-eyebrow"><span class="live-dot"></span> <span data-i18n="panel.eyebrow">Profil parlementaire</span></p>
+      <h2 id="panel-name"></h2>
+      <p id="panel-party" class="panel-party"></p>
+      <p id="panel-identity-meta" class="panel-identity-meta"></p>
+
+      <section class="ideal-card" data-i18n-aria="panel.idealAria" aria-label="Carte Ideal Point">
+        <div class="ideal-card-head">
+          <p class="ideal-card-title" data-i18n="panel.idealTitle">Position Ideal Point</p>
+          <p class="ideal-card-sub" data-i18n="panel.idealSub">Nuage des 348 sénateurs · axes du modèle</p>
+        </div>
+        <canvas id="ideal-scatter" width="560" height="420" role="img" data-i18n-aria="panel.scatterAria" aria-label="Nuage Ideal Point des sénateurs"></canvas>
+        <ul id="ideal-legend" class="ideal-legend"></ul>
+      </section>
+
+      <section id="panel-metrics" class="panel-metrics" data-i18n-aria="panel.metricsAria" aria-label="Indicateurs comparatifs"></section>
+
+      <dl id="panel-fields" class="panel-fields"></dl>
+    </aside>
+    <div id="scene-coach" class="scene-coach" role="status" aria-live="polite" hidden>
+      <div class="scene-coach-inner">
+        <span class="scene-coach-mark" aria-hidden="true">↑</span>
+        <span class="scene-coach-copy">
+          <strong data-i18n="coach.title">Cliquez sur un sénateur</strong>
+          <small data-i18n="coach.sub">pour découvrir sa position et ses indicateurs</small>
+        </span>
       </div>
     </div>
     <canvas id="c"></canvas>

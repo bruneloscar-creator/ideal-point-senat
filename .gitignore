@@ -12,3 +12,9 @@ public/preview-tribune-close.png
 public/preview-vault-side.png
 public/preview-wallart-bottom.png
 public/preview-wallart-new.png
+public/preview-*.png
+!public/preview-hemicycle.png
+public/data_probe_ideal_plot.png
+public/data/scrutins_html/
+_recovery/model_ready/
+_recovery/pages

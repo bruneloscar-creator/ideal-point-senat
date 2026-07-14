@@ -1,0 +1,74 @@
+/* Final cascade for the 3D scene HUD. The intro system lives in style.css. */
+#ui { display:block; padding:0; background:linear-gradient(180deg,rgba(5,5,7,.46),transparent 30%),linear-gradient(0deg,rgba(5,5,7,.45),transparent 20%) }
+#ui header { position:absolute; top:1rem; left:1rem; width:min(23rem,calc(100vw - 2rem)); max-width:none; padding:1.05rem; border:1px solid var(--liquid-line); border-radius:22px; background:linear-gradient(145deg,rgba(255,255,255,.1),rgba(255,255,255,.025)),rgba(10,9,13,.58); box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 18px 46px rgba(0,0,0,.24); backdrop-filter:blur(24px) saturate(145%) }
+.header-brand { display:flex; align-items:center; gap:.85rem }
+.eyebrow { margin-bottom:.25rem; color:var(--liquid-dim); font:600 .55rem/1 var(--liquid-sans); letter-spacing:.13em }
+#ui h1 { color:#fff; font:400 1.55rem/1 var(--liquid-serif); letter-spacing:-.02em }
+#ui h1 span { color:var(--liquid-red); font-style:italic }
+.header-meta { display:flex; flex-wrap:wrap; gap:.35rem; margin-top:1rem }
+.header-meta span { padding:.38rem .52rem; border:1px solid rgba(255,255,255,.07); border-radius:999px; background:rgba(255,255,255,.035); color:var(--liquid-dim); font:600 .53rem/1 var(--liquid-sans); letter-spacing:.04em; text-transform:uppercase }
+.header-meta .live-dot { width:.32rem; height:.32rem; margin-right:.22rem }
+.hint { margin-top:.75rem; color:var(--liquid-dim); font:500 .61rem/1.45 var(--liquid-sans) }
+.senator-search { max-width:none; margin-top:.75rem }
+.senator-search::before { content:'⌕'; position:absolute; left:.85rem; top:50%; z-index:1; transform:translateY(-50%); color:rgba(255,255,255,.52); font-size:1.05rem }
+.senator-search:focus-within::before { color:var(--liquid-cyan) }
+.senator-search-input { min-height:2.7rem; padding:.7rem 2.5rem .7rem 2.35rem; border:1px solid rgba(255,255,255,.12); border-radius:14px; background:rgba(255,255,255,.055); color:#fff; font:500 .76rem/1.3 var(--liquid-sans); box-shadow:inset 0 1px 0 rgba(255,255,255,.08) }
+.senator-search-input::placeholder { color:rgba(255,255,255,.34) }
+.senator-search-input:hover { border-color:rgba(255,255,255,.22); background:rgba(255,255,255,.075) }
+.senator-search-input:focus { border-color:rgba(156,236,255,.48); background:rgba(11,17,22,.82); box-shadow:0 0 0 3px rgba(156,236,255,.08),inset 0 1px 0 rgba(255,255,255,.1) }
+.senator-search-results { top:calc(100% + .45rem); padding:.35rem; border:1px solid var(--liquid-line); border-radius:16px; background:rgba(10,10,14,.9); box-shadow:0 18px 50px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08); backdrop-filter:blur(26px) saturate(140%) }
+.senator-search-item { padding:.65rem .7rem; border-radius:11px; color:var(--liquid-muted); font-family:var(--liquid-sans) }
+.senator-search-item:hover,.senator-search-item[aria-selected='true'] { background:linear-gradient(90deg,rgba(255,96,124,.18),rgba(255,255,255,.05)) }
+.senator-search-item-name { color:#fff; font-weight:600 }
+.senator-search-item-meta { color:var(--liquid-dim) }
+.about-link { margin-top:.8rem; padding:0; border:0; color:var(--liquid-dim); font:600 .59rem/1 var(--liquid-sans); letter-spacing:.03em; text-transform:uppercase }
+.about-link:hover { color:var(--liquid-cyan); border:0 }
+
+.controls { position:absolute; bottom:1rem; left:50%; display:flex; align-items:center; gap:.3rem; padding:.35rem; transform:translateX(-50%); border:1px solid var(--liquid-line); border-radius:16px; background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.025)),rgba(10,9,13,.68); box-shadow:inset 0 1px 0 rgba(255,255,255,.11),0 16px 44px rgba(0,0,0,.26); backdrop-filter:blur(24px) saturate(145%) }
+.controls-label { padding:0 .7rem; color:var(--liquid-dim); font:600 .52rem/1 var(--liquid-sans); letter-spacing:.12em; text-transform:uppercase }
+.controls button { display:inline-flex; align-items:center; gap:.45rem; min-height:2.45rem; padding:.65rem .8rem; border:1px solid transparent; border-radius:11px; background:transparent; color:var(--liquid-muted); font:600 .66rem/1 var(--liquid-sans); backdrop-filter:none }
+.controls button i { color:rgba(255,255,255,.42); font-style:normal }
+.controls button:hover,.controls button.active { border-color:rgba(255,255,255,.11); background:rgba(255,255,255,.08); color:#fff }
+.controls button.active { border-color:rgba(255,96,124,.24); background:rgba(255,96,124,.15) }
+
+.tooltip { padding:.65rem .75rem; border:1px solid var(--liquid-line); border-radius:13px; background:rgba(11,10,14,.82); box-shadow:0 16px 40px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.1); backdrop-filter:blur(20px) saturate(140%) }
+.tooltip-name { color:#fff; font:400 1.02rem/1.1 var(--liquid-serif) }
+.tooltip-party { color:var(--liquid-muted); font-family:var(--liquid-sans) }
+
+.panel { top:.75rem; right:.75rem; width:min(27rem,calc(100vw - 1.5rem)); height:calc(100% - 1.5rem); padding:1.35rem; border:1px solid var(--liquid-line); border-radius:26px; background:linear-gradient(145deg,rgba(255,255,255,.095),rgba(255,255,255,.018) 36%),rgba(11,10,14,.82); box-shadow:inset 0 1px 0 rgba(255,255,255,.13),-22px 28px 80px rgba(0,0,0,.42); backdrop-filter:blur(30px) saturate(145%); scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.14) transparent }
+.panel-close { top:1rem; right:1rem; width:2.2rem; height:2.2rem; border:1px solid rgba(255,255,255,.1); border-radius:50%; background:rgba(255,255,255,.045); color:var(--liquid-muted); font-family:var(--liquid-sans) }
+.panel-close:hover { border-color:rgba(255,255,255,.22); background:rgba(255,255,255,.1); color:#fff }
+.panel-eyebrow { display:flex; align-items:center; gap:.55rem; margin-bottom:.7rem; color:var(--liquid-dim); font:600 .57rem/1 var(--liquid-sans); letter-spacing:.13em }
+.panel .live-dot { width:.34rem; height:.34rem }
+.panel h2 { color:#fff; font:400 2rem/1.03 var(--liquid-serif); letter-spacing:-.025em }
+.panel-party { color:var(--liquid-red); font:600 .78rem/1.3 var(--liquid-sans) }
+.panel-identity-meta { color:var(--liquid-dim); font-family:var(--liquid-sans) }
+.ideal-card { margin-top:1.15rem; padding:.8rem; border:1px solid rgba(255,255,255,.08); border-radius:17px; background:rgba(255,255,255,.035) }
+.ideal-card-head { padding:.1rem .15rem .4rem }
+.ideal-card-title,.panel-metrics-title { color:rgba(255,255,255,.68); font:600 .57rem/1 var(--liquid-sans); letter-spacing:.12em }
+.ideal-card-sub { color:var(--liquid-dim); font-family:var(--liquid-sans) }
+#ideal-scatter { border-color:rgba(255,255,255,.07); border-radius:12px }
+.ideal-legend li { color:var(--liquid-dim); font-family:var(--liquid-sans) }
+.panel-metrics { gap:.65rem }
+.metric-card { padding:.85rem; border:1px solid rgba(255,255,255,.07); border-radius:15px; background:rgba(255,255,255,.025) }
+.metric-label,.panel-fields dt { color:var(--liquid-dim); font-family:var(--liquid-sans) }
+.metric-value { color:#fff; font:400 1.45rem/1 var(--liquid-serif) }
+.metric-readout,.panel-fields dd { color:var(--liquid-muted); font-family:var(--liquid-sans) }
+.metric-readout em,.panel-fields a { color:var(--liquid-cyan) }
+.metric-hint,.metric-scale { color:var(--liquid-dim); font-family:var(--liquid-sans) }
+.panel-fields { grid-template-columns:repeat(2,minmax(0,1fr)); gap:.55rem }
+.panel-fields div { padding:.75rem; border:1px solid rgba(255,255,255,.065); border-radius:13px; background:rgba(255,255,255,.025) }
+
+@media (max-width:700px) {
+  #ui { padding:0 }
+  #ui header { top:.65rem; left:.65rem; width:calc(100vw - 1.3rem); padding:.85rem; border-radius:18px }
+  .header-meta span:nth-child(n + 2),.hint { display:none }
+  .header-meta { position:absolute; top:.7rem; right:.7rem; margin:0 }
+  .senator-search { max-width:none; margin-top:.75rem }
+  .senator-search-input { padding:.7rem 2.5rem .7rem 2.35rem; font-size:.76rem }
+  .about-link { display:none }
+  .controls { bottom:max(.65rem,env(safe-area-inset-bottom)); width:calc(100vw - 1.3rem); justify-content:center }
+  .controls-label { display:none }
+  .controls button { flex:1; justify-content:center }
+  .panel { top:auto; right:.65rem; bottom:.65rem; width:calc(100vw - 1.3rem); height:auto; max-height:min(66vh,40rem); border:1px solid var(--liquid-line); border-radius:23px }
+}

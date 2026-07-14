@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/clean-sites-dist.js && vite build && node scripts/prepare-sites-build.js",
     "preview": "vite preview"
   },
   "dependencies": {

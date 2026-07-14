@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#260711" />
+    <title>À propos — Ideal Point Sénat · Oscar Brunel</title>
+    <meta
+      name="description"
+      content="Note de recherche et maquette 3D : estimation des positions de vote au Sénat par modèle IDEAL (législature 2023–2026)."
+    />
+    <meta property="og:title" content="Ideal Point Sénat — Méthode & données" />
+    <meta property="og:description" content="Comment 482 544 votes exploitables révèlent la géométrie politique du Sénat." />
+    <meta property="og:image" content="/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="/og.png" />
+    <link rel="stylesheet" href="/src/about.css" />
+    <link rel="stylesheet" href="/src/about-modern.css" />
+    <link rel="stylesheet" href="/src/apple.css" />
+  </head>
+  <body class="about-page">
+    <div id="lang-switch" class="lang-switch" data-lang-host></div>
+    <div class="atmosphere" aria-hidden="true">
+      <iframe
+        class="about-scene-background"
+        src="/?background=1"
+        title=""
+        tabindex="-1"
+        loading="eager"
+      ></iframe>
+      <div class="atmosphere-glow"></div>
+      <div class="atmosphere-grain"></div>
+      <div class="atmosphere-arc"></div>
+    </div>
+
+    <nav class="top-nav" data-i18n-aria="about.navLabel" aria-label="Navigation principale">
+      <a class="nav-back" href="/">
+        <span><strong>Ideal Point</strong><small data-i18n="about.navBackSmall">Sénat · 2023—2026</small></span>
+      </a>
+      <div class="nav-links">
+        <a href="#projet" data-i18n="about.navProject">Projet</a>
+        <a href="#methode" data-i18n="about.navMethod">Méthode</a>
+        <a href="#limites" data-i18n="about.navLimits">Limites</a>
+      </div>
+      <a class="nav-mail" href="mailto:bruneloscar@gmail.com" data-i18n-html="about.navContact">Contact <span aria-hidden="true">↗</span></a>
+    </nav>
+
+    <main>
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="live-dot"></span> <span data-i18n="about.hero.eyebrow">Note de recherche · Législature 2023–2026</span></p>
+          <h1 data-i18n-html="about.hero.title">Visualisation<br /><em>Sénat</em></h1>
+          <p class="lede" data-i18n="about.hero.lede">
+            Où se situent les sénateurs les uns par rapport aux autres, d’après
+            leurs seuls votes publics — estimé par un modèle Ideal Point, puis
+            placé dans l’hémicycle.
+          </p>
+          <div class="hero-cta">
+            <a class="btn-primary" href="/" data-i18n-html="about.hero.ctaPrimary">Explorer la maquette 3D <span aria-hidden="true">↗</span></a>
+            <a class="btn-ghost" href="#methode" data-i18n="about.hero.ctaGhost">Comprendre le modèle</a>
+          </div>
+        </div>
+        <div class="hero-stats" data-i18n-aria="about.hero.statsLabel" aria-label="Chiffres clés du modèle">
+          <div><span>01</span><strong>348</strong><small data-i18n="about.hero.stat1">sénateurs actifs</small></div>
+          <div><span>02</span><strong>3 558</strong><small data-i18n="about.hero.stat2">scrutins retenus</small></div>
+          <div><span>03</span><strong>482 544</strong><small data-i18n="about.hero.stat3">votes exploitables</small></div>
+          <div><span>04</span><strong>2</strong><small data-i18n="about.hero.stat4">dimensions latentes</small></div>
+        </div>
+      </header>
+
+      <section class="section" id="qui-je-suis" aria-labelledby="qui-title">
+        <p class="section-label">01</p>
+        <h2 id="qui-title" data-i18n="about.who.title">Qui je suis</h2>
+        <p data-i18n-html="about.who.body">
+          Je suis <strong>Oscar Brunel</strong>. Cette note documente un travail
+          de recherche sur les positions de vote au Sénat : un modèle Ideal Point
+          bayésien, et une maquette 3D qui place chaque siège à sa position
+          estimée à partir des scrutins publics.
+        </p>
+      </section>
+
+      <section class="section" id="projet" aria-labelledby="projet-title">
+        <p class="section-label">02</p>
+        <h2 id="projet-title" data-i18n="about.project.title">Le projet</h2>
+        <p data-i18n-html="about.project.p1">
+          Cette application croise deux objets : une <strong>maquette 3D</strong>
+          des 348 sièges du Palais du Luxembourg, et une
+          <strong>carte Ideal Point</strong> issue de l’analyse des votes depuis le
+          renouvellement de 2023.
+        </p>
+        <p data-i18n-html="about.project.p2">
+          Le principe relève de l’apprentissage statistique : à partir de la matrice
+          des votes (sénateurs × scrutins, « pour » / « contre »), un modèle place
+          chaque sénateur dans un espace à deux dimensions — sans étiquette de parti.
+          Deux sénateurs qui votent de façon similaire se retrouvent proches ; ceux
+          qui s’opposent souvent sont éloignés.
+        </p>
+        <p class="note" data-i18n-html="about.project.note">
+          Le résultat mesure une <em>position de vote révélée</em> sur un ensemble de
+          votes publics sélectionnés. Ce n’est pas une mesure d’idéologie au sens
+          large : un vote au Sénat dépend aussi de la discipline de groupe, de la
+          nature des textes et du calendrier parlementaire.
+        </p>
+      </section>
+
+      <section class="section about-map" id="carte" aria-labelledby="carte-title">
+        <p class="section-label">03</p>
+        <h2 id="carte-title" data-i18n="about.map.title">La carte Ideal Point</h2>
+        <p data-i18n="about.map.body">
+          Chaque point est un sénateur. L’axe horizontal suit le clivage
+          gauche–droite qui émerge des votes ; l’axe vertical place plus haut les
+          profils éloignés du banc de la présidence (dont le RDPI).
+        </p>
+        <figure class="about-ideal">
+          <div class="about-ideal-frame">
+            <canvas
+              id="about-ideal-scatter"
+              width="720"
+              height="540"
+              role="img"
+              data-i18n-aria="about.map.scatterAria"
+              aria-label="Nuage Ideal Point des 348 sénateurs"
+            ></canvas>
+          </div>
+          <figcaption class="about-ideal-caption" data-i18n="about.map.caption">
+            Carte Ideal Point · législature 2023–2026
+          </figcaption>
+          <ul id="about-ideal-legend" class="ideal-legend about-ideal-legend" data-i18n-aria="about.map.legendAria" aria-label="Légende des groupes"></ul>
+        </figure>
+      </section>
+
+      <section class="section" id="methode" aria-labelledby="methode-title">
+        <p class="section-label">04</p>
+        <h2 id="methode-title" data-i18n="about.method.title">Ce qui a été fait</h2>
+
+        <h3 data-i18n="about.method.dataTitle">Données</h3>
+        <p data-i18n-html="about.method.dataBody">
+          Les données brutes rassemblent <strong>698&nbsp;455</strong> votes
+          individuels pour les <strong>348</strong> sénateurs actifs, répartis sur
+          <strong>4&nbsp;759</strong> scrutins. Après filtres — votes exprimés
+          uniquement, scrutins déséquilibrés écartés (minorité &lt;&nbsp;10&nbsp;%),
+          seuil de présence (≥&nbsp;25 votes exprimés) — le modèle porte sur
+          <strong>3&nbsp;558</strong> scrutins et <strong>482&nbsp;544</strong> votes
+          exploitables (54&nbsp;% contre, 46&nbsp;% pour).
+        </p>
+
+        <h3 data-i18n="about.method.howTitle">Comment Ideal Point marche</h3>
+        <p data-i18n-html="about.method.howP1">
+          On part d’une matrice votes : sénateurs × scrutins. Chaque case est
+          «&nbsp;pour&nbsp;» ou «&nbsp;contre&nbsp;» ; abstention ou absence → case
+          manquante.
+        </p>
+        <p data-i18n-html="about.method.howP2">
+          Chaque sénateur a une position latente <em>x<sub>i</sub></em> (ici en
+          2D) ; chaque scrutin a ses paramètres de discrimination et de difficulté.
+          Style spatial / réponse à l’item (famille IDEAL /
+          Clinton–Jackman–Rivers)&nbsp;: la probabilité de voter «&nbsp;oui&nbsp;»
+          monte quand la position du sénateur s’aligne avec le côté proposé —
+          schématiquement&nbsp;:
+          <code>P(oui) ≈ Φ(β′x<sub>i</sub> − α)</code>.
+        </p>
+        <p data-i18n-html="about.method.howP3">
+          L’estimation MCMC (<code>pscl::ideal</code>) récupère les coordonnées ;
+          les axes sont ensuite orientés (gauche–droite, etc.) pour la lecture.
+        </p>
+
+        <h3 data-i18n="about.method.idealTitle">Modèle IDEAL (mise en œuvre)</h3>
+        <p data-i18n-html="about.method.idealBody">
+          Ici&nbsp;: 2 dimensions, 1&nbsp;000 itérations, 500 de rodage, thin 25.
+          Votes codés 1&nbsp;=&nbsp;pour, 0&nbsp;=&nbsp;contre ; abstentions et
+          absences = manquantes. L’orientation de l’axe gauche–droite est fixée
+          après estimation à partir des groupes de référence.
+        </p>
+
+        <h3 data-i18n="about.method.readTitle">Lecture de l’espace</h3>
+        <ul class="findings">
+          <li data-i18n-html="about.method.read1">
+            La <strong>dimension 1</strong> correspond à un clivage gauche–droite
+            qui émerge des votes eux-mêmes, sans avoir été imposé.
+          </li>
+          <li data-i18n-html="about.method.read2">
+            La <strong>dimension 2</strong> capte des différences secondaires ;
+            elle semble pouvoir représenter le soutien au gouvernement (haut =
+            plus proche du bloc gouvernemental).
+          </li>
+          <li data-i18n-html="about.method.read3">
+            Les groupes forment des blocs distincts le long de l’axe horizontal,
+            confirmant que le modèle reconstitue la structure politique de
+            l’assemblée à partir des seuls votes.
+          </li>
+          <li data-i18n-html="about.method.read4">
+            Les non-inscrits (RN, Reconquête) apparaissent près du centre : artefact
+            lié aux abstentions fréquentes, traitées comme données manquantes —
+            le modèle manque alors de votes exprimés pour les situer.
+          </li>
+        </ul>
+
+        <h3 data-i18n="about.method.vizTitle">Visualisation</h3>
+        <p data-i18n="about.method.vizBody">
+          La maquette 3D place chaque sénateur sur son siège et expose, au clic, sa
+          position Ideal Point dans le nuage de l’hémicycle — pour relier le
+          plancher du Sénat à la géométrie des votes.
+        </p>
+      </section>
+
+      <section class="section limits" id="limites" aria-labelledby="limites-title">
+        <p class="section-label">05</p>
+        <h2 id="limites-title" data-i18n="about.limits.title">Portée et limites</h2>
+        <ul class="findings">
+          <li data-i18n="about.limits.1">
+            Position de vote révélée sur scrutins publics sélectionnés — pas une
+            idéologie complète ni l’activité hors hémicycle.
+          </li>
+          <li data-i18n="about.limits.2">
+            La nature des textes mis au vote public influence les positions estimées.
+          </li>
+          <li data-i18n="about.limits.3">
+            La discipline de groupe, structurellement forte, comprime les écarts
+            internes et peut exagérer la cohésion apparente.
+          </li>
+          <li data-i18n="about.limits.4">
+            La zone centrale mêle profils centristes et profils peu positionnables
+            (faibles votants).
+          </li>
+        </ul>
+      </section>
+
+      <section class="section refs" id="references" aria-labelledby="refs-title">
+        <p class="section-label">06</p>
+        <h2 id="refs-title" data-i18n="about.refs.title">Références</h2>
+        <p data-i18n-html="about.refs.intro">
+          La méthodologie s’appuie notamment sur&nbsp;:
+        </p>
+        <ol class="ref-list">
+          <li>
+            <a
+              href="https://www.cambridge.org/core/journals/political-analysis/article/abs/largescale-ideal-point-estimation/82E7DAAE1843396437B8FEF97A3DFC98"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Peress, M. (2022). Large-Scale Ideal Point Estimation.
+              <em>Political Analysis</em>, 30(3), 346–363.</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.cambridge.org/core/journals/political-science-research-and-methods/article/abs/governmentopposition-or-leftright-the-institutional-determinants-of-voting-in-legislatures/DB12FFA0B0B127BE76BC59007236212C"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Hix, S., &amp; Noury, A. (2016). Government-Opposition or
+              Left-Right? The Institutional Determinants of Voting in Legislatures.
+              <em>Political Science Research and Methods</em>, 4(2), 249–273.</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://onlinelibrary.wiley.com/doi/10.1111/j.0092-5853.2004.00091.x"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Rosenthal, H. L., &amp; Voeten, E. (2004). Analyzing Roll Calls with
+              Perfect Spatial Voting: France 1946–1958.
+              <em>American Journal of Political Science</em>, 48(3), 620–632.</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.cambridge.org/core/journals/american-political-science-review/article/rollcall-vote-selection-implications-for-the-study-of-legislative-politics/FFAD60FB9CA9BBD54F02DE44A1FF0264"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Ainsley, C., Carrubba, C. J., Crisp, B. F., Demirkaya, B., Gabel,
+              M. J., &amp; Hadzic, D. (2020). Roll-Call Vote Selection: Implications
+              for the Study of Legislative Politics.
+              <em>American Political Science Review</em>, 114(3), 691–706.</a
+            >
+          </li>
+        </ol>
+      </section>
+
+      <section class="section contact" id="contact" aria-labelledby="contact-title">
+        <p class="section-label">07</p>
+        <h2 id="contact-title" data-i18n="about.contact.title">Contact</h2>
+        <p data-i18n="about.contact.body">Pour toute question sur la méthode, les données ou la maquette :</p>
+        <ul class="contact-links">
+          <li>
+            <a href="mailto:bruneloscar@gmail.com">bruneloscar@gmail.com</a>
+          </li>
+          <li>
+            <a
+              href="https://www.linkedin.com/in/oscar-brunel-624657334/"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-i18n="about.contact.linkedin"
+              >LinkedIn — Oscar Brunel</a
+            >
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p data-i18n="about.footer.copy">Oscar Brunel · Ideal Point Sénat · Maquette hémicycle 3D</p>
+      <a href="/" data-i18n="about.footer.back">Retour à l’hémicycle</a>
+    </footer>
+    <script type="module" src="/src/about.js"></script>
+  </body>
+</html>
