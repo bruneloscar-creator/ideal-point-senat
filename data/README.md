@@ -1,8 +1,19 @@
-# Données du modèle
+# Données des modèles Ideal Point
 
-Ce dossier contient les tables préparées utilisées par le pipeline Ideal Point.
+Ce dossier contient les sources, les tables préparées, les estimations et les comparaisons pour le Sénat et l’Assemblée nationale.
 
-## Fichiers
+## Organisation
+
+| Chemin | Contenu |
+| --- | --- |
+| `model_ready/` | Jeu Sénat utilisé par le notebook principal |
+| `senat/outputs/` | Coordonnées et objets du modèle Sénat |
+| `assemblee/raw/` | Archives officielles de l’Assemblée nationale |
+| `assemblee/model_ready/` | Tables nettoyées L14 à L17 |
+| `assemblee/outputs/l14/` à `l17/` | Matrices, modèles, coordonnées, diagnostics et graphiques |
+| `comparison_senat_an/` | Ponts parlementaires et alignement des deux espaces |
+
+## Fichiers Sénat
 
 | Fichier | Contenu | Lignes |
 | --- | --- | ---: |
@@ -38,3 +49,7 @@ La matrice finale contient 348 sénateurs, 3 558 scrutins et 482 544 votes utili
 Les tables ont été préparées à partir des publications publiques du Sénat français. Les pages de référence sont indiquées dans [`../REFERENCES.md`](../REFERENCES.md).
 
 La réutilisation des données reste soumise aux conditions du portail Open Data du Sénat.
+
+Les archives et tables de l’Assemblée nationale proviennent de [data.assemblee-nationale.fr](https://data.assemblee-nationale.fr/). Leur pipeline, leurs législatures et leurs sorties sont détaillés dans [`assemblee/README.md`](assemblee/README.md).
+
+La comparaison entre chambres est documentée dans [`comparison_senat_an/README.md`](comparison_senat_an/README.md).

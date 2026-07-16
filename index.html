@@ -121,12 +121,40 @@
             hidden
           ></ul>
         </div>
-        <a class="about-link" href="/about.html" data-i18n-html="header.about">À propos <span aria-hidden="true">↗</span></a>
+        <a class="about-link" href="/about.html" data-i18n-html="header.about">La méthode <span aria-hidden="true">↗</span></a>
       </header>
+      <div class="bottom-dock" id="bottom-dock">
+      <div class="chamber-switch" id="chamber-switch" role="group" data-i18n-aria="chamber.aria" aria-label="Chambre parlementaire">
+        <span class="chamber-switch-label" data-i18n="chamber.label">Chambre</span>
+        <button type="button" data-chamber="senat" class="active" aria-pressed="true" data-i18n="chamber.senat">Sénat</button>
+        <button type="button" data-chamber="assemblee" aria-pressed="false" data-i18n="chamber.assemblee">Assemblée nationale</button>
+      </div>
+      <div class="period-slider" id="period-slider" hidden>
+        <div class="period-slider-head">
+          <span class="period-slider-label" data-i18n="period.label">Législature</span>
+          <span class="period-slider-current" id="period-current"></span>
+        </div>
+        <div class="period-track-wrap">
+          <input
+            type="range"
+            id="period-range"
+            class="period-range"
+            min="0"
+            max="0"
+            step="1"
+            value="0"
+            data-i18n-aria="period.aria"
+            aria-label="Évolution dans le temps"
+          />
+        </div>
+        <div class="period-ticks" id="period-ticks" role="group" data-i18n-aria="period.aria" aria-label="Choisir une législature"></div>
+        <p class="period-dates" id="period-dates"></p>
+      </div>
       <div class="controls">
         <span class="controls-label" data-i18n="controls.label">Caméra</span>
         <button type="button" id="btn-reset" data-i18n-title="controls.resetTitle" data-i18n-html="controls.reset" title="Réinitialiser la caméra"><i aria-hidden="true">⌂</i> Vue globale</button>
         <button type="button" id="btn-orbit" data-i18n-title="controls.orbitTitle" data-i18n-html="controls.orbit" title="Vue depuis les bancs, vers la tribune"><i aria-hidden="true">◉</i> Orbite guidée</button>
+      </div>
       </div>
     </div>
     <div id="tooltip" class="tooltip" hidden>
@@ -136,9 +164,14 @@
     <aside id="panel" class="panel" hidden aria-live="polite">
       <button type="button" id="panel-close" class="panel-close" data-i18n-aria="panel.close" aria-label="Fermer">×</button>
       <p class="panel-eyebrow"><span class="live-dot"></span> <span data-i18n="panel.eyebrow">Profil parlementaire</span></p>
-      <h2 id="panel-name"></h2>
-      <p id="panel-party" class="panel-party"></p>
-      <p id="panel-identity-meta" class="panel-identity-meta"></p>
+      <div class="panel-identity">
+        <img id="panel-avatar" class="panel-avatar" alt="" hidden width="72" height="72" />
+        <div class="panel-identity-text">
+          <h2 id="panel-name"></h2>
+          <p id="panel-party" class="panel-party"></p>
+          <p id="panel-identity-meta" class="panel-identity-meta"></p>
+        </div>
+      </div>
 
       <section class="ideal-card" data-i18n-aria="panel.idealAria" aria-label="Carte Ideal Point">
         <div class="ideal-card-head">

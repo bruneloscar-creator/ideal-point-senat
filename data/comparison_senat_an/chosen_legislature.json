@@ -1,0 +1,48 @@
+{
+  "chosen_legislature": "14",
+  "criterion": "Maximize number of *current* senators who (a) held an ASSEMBLEE mandat in that législature per AMO30 and (b) cast ≥ 25 yes/no votes in the cleaned AN vote file (excludes Congrès one-offs).",
+  "n_current_senators": 348,
+  "n_amo_active_senators_with_an_mandat": 26,
+  "n_matched_to_senateurs_actifs": 26,
+  "match_method_counts": {
+    "name_unique": 26
+  },
+  "overlap_by_legislature": [
+    {
+      "legislature": "12",
+      "n_with_mandat": 9,
+      "n_with_votes": 0,
+      "n_eligible_bridge_min_votes": 0,
+      "data_available": false
+    },
+    {
+      "legislature": "13",
+      "n_with_mandat": 14,
+      "n_with_votes": 0,
+      "n_eligible_bridge_min_votes": 0,
+      "data_available": false
+    },
+    {
+      "legislature": "14",
+      "n_with_mandat": 19,
+      "n_with_votes": 18,
+      "n_eligible_bridge_min_votes": 17,
+      "data_available": true
+    },
+    {
+      "legislature": "15",
+      "n_with_mandat": 7,
+      "n_with_votes": 6,
+      "n_eligible_bridge_min_votes": 6,
+      "data_available": true
+    },
+    {
+      "legislature": "16",
+      "n_with_mandat": 0,
+      "n_with_votes": 21,
+      "n_eligible_bridge_min_votes": 0,
+      "data_available": true
+    }
+  ],
+  "l13_note": "L13 often appears in mandats but has no official Scrutins dump; it cannot be used for ideal-point bridging until votes exist."
+}

@@ -1,0 +1,11 @@
+{
+  "active_deputes": 577,
+  "model_deputes": 575,
+  "model_roll_calls": 7410,
+  "model_rows": 1007954,
+  "matrix_shape": [
+    575,
+    7410
+  ],
+  "na_cells": 3252796
+}

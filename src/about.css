@@ -522,6 +522,13 @@ main {
   letter-spacing: 0.02em;
 }
 
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem 1.25rem;
+  align-items: center;
+}
+
 .site-footer a {
   color: var(--gold);
   text-decoration: none;

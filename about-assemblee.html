@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#260711" />
+    <title>À propos — Ideal Point Assemblée · Oscar Brunel</title>
+    <meta
+      name="description"
+      content="Note de recherche et maquette 3D : estimation des positions de vote à l’Assemblée nationale par modèle IDEAL (législatures 14e–17e)."
+    />
+    <meta property="og:title" content="Ideal Point Assemblée — Méthode & données" />
+    <meta property="og:description" content="Comment plus d’un million de votes exploitables révèlent la géométrie politique de l’Assemblée." />
+    <meta property="og:image" content="/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="/og.png" />
+    <link rel="stylesheet" href="/src/about.css" />
+    <link rel="stylesheet" href="/src/about-modern.css" />
+    <link rel="stylesheet" href="/src/apple.css" />
+  </head>
+  <body class="about-page about-assemblee-page" data-chamber="assemblee">
+    <div id="lang-switch" class="lang-switch" data-lang-host></div>
+    <div class="atmosphere" aria-hidden="true">
+      <iframe
+        class="about-scene-background"
+        src="/?chamber=assemblee&background=1"
+        title=""
+        tabindex="-1"
+        loading="eager"
+      ></iframe>
+      <div class="atmosphere-glow"></div>
+      <div class="atmosphere-grain"></div>
+      <div class="atmosphere-arc"></div>
+    </div>
+
+    <nav class="top-nav" data-i18n-aria="aboutAn.navLabel" aria-label="Navigation principale">
+      <a class="nav-back" href="/?chamber=assemblee">
+        <span><strong>Ideal Point</strong><small data-i18n="aboutAn.navBackSmall">Assemblée · L14—L17</small></span>
+      </a>
+      <div class="nav-links">
+        <a href="#projet" data-i18n="aboutAn.navProject">Projet</a>
+        <a href="#methode" data-i18n="aboutAn.navMethod">Méthode</a>
+        <a href="#limites" data-i18n="aboutAn.navLimits">Limites</a>
+      </div>
+      <a class="nav-mail" href="mailto:bruneloscar@gmail.com" data-i18n-html="aboutAn.navContact">Contact <span aria-hidden="true">↗</span></a>
+    </nav>
+
+    <main>
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="live-dot"></span> <span data-i18n="aboutAn.hero.eyebrow">Note de recherche · Législatures 14e–17e</span></p>
+          <h1 data-i18n-html="aboutAn.hero.title">Visualisation<br /><em>Assemblée</em></h1>
+          <p class="lede" data-i18n="aboutAn.hero.lede">
+            Où se situent les députés les uns par rapport aux autres, d’après
+            leurs seuls votes publics — estimé par un modèle Ideal Point, puis
+            placé dans l’hémicycle.
+          </p>
+          <div class="hero-cta">
+            <a class="btn-primary" href="/?chamber=assemblee" data-i18n-html="aboutAn.hero.ctaPrimary">Explorer la maquette 3D <span aria-hidden="true">↗</span></a>
+            <a class="btn-ghost" href="#methode" data-i18n="aboutAn.hero.ctaGhost">Comprendre le modèle</a>
+          </div>
+        </div>
+        <div class="hero-stats" data-i18n-aria="aboutAn.hero.statsLabel" aria-label="Chiffres clés du modèle">
+          <div><span>01</span><strong>575</strong><small data-i18n="aboutAn.hero.stat1">députés (modèle L17)</small></div>
+          <div><span>02</span><strong>7 410</strong><small data-i18n="aboutAn.hero.stat2">scrutins retenus (L17)</small></div>
+          <div><span>03</span><strong>1 007 954</strong><small data-i18n="aboutAn.hero.stat3">votes exploitables (L17)</small></div>
+          <div><span>04</span><strong>2</strong><small data-i18n="aboutAn.hero.stat4">dimensions latentes</small></div>
+        </div>
+      </header>
+
+      <section class="section" id="qui-je-suis" aria-labelledby="qui-title">
+        <p class="section-label">01</p>
+        <h2 id="qui-title" data-i18n="aboutAn.who.title">Qui je suis</h2>
+        <p data-i18n-html="aboutAn.who.body">
+          Je suis <strong>Oscar Brunel</strong>. Cette note documente un travail
+          de recherche sur les positions de vote à l’Assemblée nationale : un
+          modèle Ideal Point bayésien multi-législatures, et une maquette 3D qui
+          place chaque siège à sa position estimée à partir des scrutins publics.
+        </p>
+      </section>
+
+      <section class="section" id="projet" aria-labelledby="projet-title">
+        <p class="section-label">02</p>
+        <h2 id="projet-title" data-i18n="aboutAn.project.title">Le projet</h2>
+        <p data-i18n-html="aboutAn.project.p1">
+          Cette application croise deux objets : une <strong>maquette 3D</strong>
+          des 577 sièges du Palais Bourbon, et une
+          <strong>carte Ideal Point</strong> issue de l’analyse des votes sur les
+          législatures 14e à 17e (curseur temporel dans la scène).
+        </p>
+        <p data-i18n-html="aboutAn.project.p2">
+          Le principe relève de l’apprentissage statistique : à partir de la matrice
+          des votes (députés × scrutins, « pour » / « contre »), un modèle place
+          chaque député dans un espace à deux dimensions — sans étiquette de parti.
+          Deux députés qui votent de façon similaire se retrouvent proches ; ceux
+          qui s’opposent souvent sont éloignés.
+        </p>
+        <p class="note" data-i18n-html="aboutAn.project.note">
+          Le résultat mesure une <em>position de vote révélée</em> sur un ensemble de
+          votes publics sélectionnés. Ce n’est pas une mesure d’idéologie au sens
+          large : un vote à l’Assemblée dépend aussi de la discipline de groupe, de la
+          nature des textes et du calendrier parlementaire.
+        </p>
+      </section>
+
+      <section class="section about-map" id="carte" aria-labelledby="carte-title">
+        <p class="section-label">03</p>
+        <h2 id="carte-title" data-i18n="aboutAn.map.title">La carte Ideal Point</h2>
+        <p data-i18n="aboutAn.map.body">
+          Chaque point est un député (17e législature). L’axe horizontal suit le
+          clivage gauche–droite qui émerge des votes ; l’axe vertical place plus
+          haut les profils proches du bloc majoritaire (EPR, DEM, HOR).
+        </p>
+        <figure class="about-ideal">
+          <div class="about-ideal-frame">
+            <canvas
+              id="about-ideal-scatter"
+              width="720"
+              height="540"
+              role="img"
+              data-i18n-aria="aboutAn.map.scatterAria"
+              aria-label="Nuage Ideal Point des députés (17e législature)"
+            ></canvas>
+          </div>
+          <figcaption class="about-ideal-caption" data-i18n="aboutAn.map.caption">
+            Carte Ideal Point · 17e législature
+          </figcaption>
+          <ul id="about-ideal-legend" class="ideal-legend about-ideal-legend" data-i18n-aria="aboutAn.map.legendAria" aria-label="Légende des groupes"></ul>
+        </figure>
+      </section>
+
+      <section class="section" id="methode" aria-labelledby="methode-title">
+        <p class="section-label">04</p>
+        <h2 id="methode-title" data-i18n="aboutAn.method.title">Ce qui a été fait</h2>
+
+        <h3 data-i18n="aboutAn.method.dataTitle">Données</h3>
+        <p data-i18n-html="aboutAn.method.dataBody">
+          Quatre législatures sont fittées indépendamment (14e–17e) à partir des
+          dumps officiels de scrutins. Sur la <strong>17e</strong>, après filtres —
+          votes exprimés uniquement, scrutins déséquilibrés écartés, seuil de
+          présence — le modèle porte sur <strong>575</strong> députés,
+          <strong>7&nbsp;410</strong> scrutins et <strong>1&nbsp;007&nbsp;954</strong>
+          votes exploitables.
+        </p>
+
+        <h3 data-i18n="aboutAn.method.howTitle">Comment Ideal Point marche</h3>
+        <p data-i18n-html="aboutAn.method.howP1">
+          On part d’une matrice votes : députés × scrutins. Chaque case est
+          «&nbsp;pour&nbsp;» ou «&nbsp;contre&nbsp;» ; abstention ou absence → case
+          manquante.
+        </p>
+        <p data-i18n-html="aboutAn.method.howP2">
+          Chaque député a une position latente <em>x<sub>i</sub></em> (ici en
+          2D) ; chaque scrutin a ses paramètres de discrimination et de difficulté.
+          Style spatial / réponse à l’item (famille IDEAL /
+          Clinton–Jackman–Rivers)&nbsp;: la probabilité de voter «&nbsp;oui&nbsp;»
+          monte quand la position du député s’aligne avec le côté proposé —
+          schématiquement&nbsp;:
+          <code>P(oui) ≈ Φ(β′x<sub>i</sub> − α)</code>.
+        </p>
+        <p data-i18n-html="aboutAn.method.howP3">
+          L’estimation MCMC (<code>pscl::ideal</code>) récupère les coordonnées ;
+          les axes sont ensuite orientés (gauche–droite, majorité–opposition) pour
+          la lecture.
+        </p>
+
+        <h3 data-i18n="aboutAn.method.idealTitle">Modèle IDEAL (mise en œuvre)</h3>
+        <p data-i18n-html="aboutAn.method.idealBody">
+          Ici&nbsp;: 2 dimensions, 1&nbsp;000 itérations, 500 de rodage, thin 25.
+          Votes codés 1&nbsp;=&nbsp;pour, 0&nbsp;=&nbsp;contre ; abstentions et
+          absences = manquantes. L’orientation est fixée après estimation à partir
+          des groupes de référence (gauche / droite / majorité).
+        </p>
+
+        <h3 data-i18n="aboutAn.method.readTitle">Lecture de l’espace</h3>
+        <ul class="findings">
+          <li data-i18n-html="aboutAn.method.read1">
+            La <strong>dimension 1</strong> correspond à un clivage gauche–droite
+            qui émerge des votes eux-mêmes, sans avoir été imposé.
+          </li>
+          <li data-i18n-html="aboutAn.method.read2">
+            La <strong>dimension 2</strong> capte un clivage résiduel
+            <em>majorité / opposition</em>, distinct du gauche–droite (voir analyse
+            ci-dessous).
+          </li>
+          <li data-i18n-html="aboutAn.method.read3">
+            Les groupes forment des blocs distincts le long de l’axe horizontal,
+            confirmant que le modèle reconstitue la structure politique de
+            l’Assemblée à partir des seuls votes.
+          </li>
+          <li data-i18n-html="aboutAn.method.read4">
+            En Assemblée sans majorité absolue, le soutien au bloc présidentiel
+            structure fortement les votes — d’où une 2<sup>e</sup> dimension lisible
+            comme majorité vs opposition.
+          </li>
+        </ul>
+
+        <h3 data-i18n="aboutAn.method.axis2Title">Analyse de l’axe 2</h3>
+        <p data-i18n-html="aboutAn.method.axis2P1">
+          Après orientation (audit L17), <strong>dim1 = gauche → droite</strong>.
+          <strong>Dim2</strong> ne redouble pas cet axe : elle sépare plutôt le
+          soutien à la majorité présidentielle (<strong>EPR</strong>,
+          <strong>DEM</strong>, <strong>HOR</strong>) de l’opposition, dans une
+          Assemblée sans majorité absolue.
+        </p>
+        <p data-i18n-html="aboutAn.method.axis2P2">
+          Sur la 17<sup>e</sup> législature, les groupes de la majorité se situent
+          haut sur dim2 (moyennes ≈&nbsp;0,36–0,50). Les oppositions
+          (<strong>LFI-NFP</strong>, <strong>RN</strong>, etc.) sont plus bas. La
+          corrélation avec le bloc majoritaire est forte sur dim2, alors que LFI et
+          RN peuvent être proches sur cet axe tout en restant opposés sur dim1 —
+          signature d’un clivage <em>orthogonal-ish</em> au gauche–droite.
+        </p>
+        <ul class="findings">
+          <li data-i18n-html="aboutAn.method.axis2F1">
+            <strong>Dim2 = clivage résiduel</strong> soutien / opposition à la
+            majorité — pas un second axe gauche–droite.
+          </li>
+          <li data-i18n-html="aboutAn.method.axis2F2">
+            Dim2 est <strong>plus faible</strong> que dim1 (APRE ≈&nbsp;0,45 vs
+            ≈&nbsp;0,86) : ne pas la sur-interpréter comme «&nbsp;extrémisme&nbsp;».
+          </li>
+          <li data-i18n-html="aboutAn.method.axis2F3">
+            Centre sur dim1 + haut sur dim2 = <strong>centristes de majorité</strong>,
+            pas des profils «&nbsp;neutres&nbsp;».
+          </li>
+          <li data-i18n-html="aboutAn.method.axis2F4">
+            Alignement Procrustes Sénat ↔ AN (L14) : <strong>corr(dim2) ≈&nbsp;0</strong>
+            — la 2<sup>e</sup> dimension n’est pas partagée entre chambres ; seule
+            dim1 se compare.
+          </li>
+        </ul>
+        <p class="note" data-i18n-html="aboutAn.method.axis2Note">
+          Les pondérations APRE réduisent encore le poids visuel de dim2 dans la
+          carte pondérée. Lire dim2 comme un signal secondaire, utile pour la
+          géométrie majorité / opposition, pas comme une échelle d’intensité
+          idéologique.
+        </p>
+
+        <h3 data-i18n="aboutAn.method.vizTitle">Visualisation</h3>
+        <p data-i18n="aboutAn.method.vizBody">
+          La maquette 3D place chaque député sur son siège et expose, au clic, sa
+          position Ideal Point dans le nuage de l’hémicycle — pour relier le
+          plancher de l’Assemblée à la géométrie des votes. Un curseur permet de
+          passer d’une législature fittée à l’autre.
+        </p>
+      </section>
+
+      <section class="section limits" id="limites" aria-labelledby="limites-title">
+        <p class="section-label">05</p>
+        <h2 id="limites-title" data-i18n="aboutAn.limits.title">Portée et limites</h2>
+        <ul class="findings">
+          <li data-i18n="aboutAn.limits.1">
+            Position de vote révélée sur scrutins publics sélectionnés — pas une
+            idéologie complète ni l’activité hors hémicycle.
+          </li>
+          <li data-i18n="aboutAn.limits.2">
+            La nature des textes mis au vote public influence les positions estimées.
+          </li>
+          <li data-i18n="aboutAn.limits.3">
+            La discipline de groupe, structurellement forte, comprime les écarts
+            internes et peut exagérer la cohésion apparente.
+          </li>
+          <li data-i18n="aboutAn.limits.4">
+            Dim2 n’est pas un axe commun Sénat / Assemblée : ne pas comparer les
+            hauteurs verticales d’une chambre à l’autre.
+          </li>
+        </ul>
+      </section>
+
+      <section class="section refs" id="references" aria-labelledby="refs-title">
+        <p class="section-label">06</p>
+        <h2 id="refs-title" data-i18n="aboutAn.refs.title">Références</h2>
+        <p data-i18n-html="aboutAn.refs.intro">
+          La méthodologie s’appuie notamment sur&nbsp;:
+        </p>
+        <ol class="ref-list">
+          <li>
+            <a
+              href="https://www.cambridge.org/core/journals/political-analysis/article/abs/largescale-ideal-point-estimation/82E7DAAE1843396437B8FEF97A3DFC98"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Peress, M. (2022). Large-Scale Ideal Point Estimation.
+              <em>Political Analysis</em>, 30(3), 346–363.</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.cambridge.org/core/journals/political-science-research-and-methods/article/abs/governmentopposition-or-leftright-the-institutional-determinants-of-voting-in-legislatures/DB12FFA0B0B127BE76BC59007236212C"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Hix, S., &amp; Noury, A. (2016). Government-Opposition or
+              Left-Right? The Institutional Determinants of Voting in Legislatures.
+              <em>Political Science Research and Methods</em>, 4(2), 249–273.</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://onlinelibrary.wiley.com/doi/10.1111/j.0092-5853.2004.00091.x"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Rosenthal, H. L., &amp; Voeten, E. (2004). Analyzing Roll Calls with
+              Perfect Spatial Voting: France 1946–1958.
+              <em>American Journal of Political Science</em>, 48(3), 620–632.</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.cambridge.org/core/journals/american-political-science-review/article/abs/rollcall-vote-selection-implications-for-the-study-of-legislative-politics/FFAD60FB9CA9BBD54F02DE44A1FF0264"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Ainsley, C., Carrubba, C. J., Crisp, B. F., Demirkaya, B., Gabel,
+              M. J., &amp; Hadzic, D. (2020). Roll-Call Vote Selection: Implications
+              for the Study of Legislative Politics.
+              <em>American Political Science Review</em>, 114(3), 691–706.</a
+            >
+          </li>
+        </ol>
+      </section>
+
+      <section class="section contact" id="contact" aria-labelledby="contact-title">
+        <p class="section-label">07</p>
+        <h2 id="contact-title" data-i18n="aboutAn.contact.title">Contact</h2>
+        <p data-i18n="aboutAn.contact.body">Pour toute question sur la méthode, les données ou la maquette :</p>
+        <ul class="contact-links">
+          <li>
+            <a href="mailto:bruneloscar@gmail.com">bruneloscar@gmail.com</a>
+          </li>
+          <li>
+            <a
+              href="https://www.linkedin.com/in/oscar-brunel-624657334/"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-i18n="aboutAn.contact.linkedin"
+              >LinkedIn — Oscar Brunel</a
+            >
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p data-i18n="aboutAn.footer.copy">Oscar Brunel · Ideal Point Assemblée · Maquette hémicycle 3D</p>
+      <div class="site-footer-links">
+        <a href="/?chamber=assemblee" data-i18n="aboutAn.footer.back">Retour à l’hémicycle</a>
+        <a href="/about.html" data-i18n="aboutAn.footer.senate">Note Sénat</a>
+      </div>
+    </footer>
+    <script type="module" src="/src/about-assemblee.js"></script>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+legislature,active_deputes,model_deputes,model_roll_calls,model_rows,dim1_multiplier,dim2_multiplier,model
+14,642,621,638,89957,1.0,0.9471265412837037,pscl::ideal d=2 seed=123 maxiter=1000 burnin=500 thin=25 impute=FALSE
+15,651,640,3466,357483,1.0,0.8874522077740185,pscl::ideal d=2 seed=123 maxiter=1000 burnin=500 thin=25 impute=FALSE
+16,962,598,3344,481136,1.0,0.9166125863243149,pscl::ideal d=2 seed=123 maxiter=1000 burnin=500 thin=25 impute=FALSE
+17,577,575,7410,1007954,1.0,0.7190473335661708,pscl::ideal d=2 seed=123 maxiter=1000 burnin=500 thin=25 impute=FALSE

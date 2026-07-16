@@ -1,0 +1,65 @@
+{
+  "created_at_utc": "2026-07-16T20:48:31.959706+00:00",
+  "source": "data.assemblee-nationale.fr open data dumps",
+  "raw_dir": "/Users/oscar/Downloads/test 3D/data/assemblee/raw",
+  "legislatures": [
+    {
+      "legislature": "14",
+      "n_scrutins": 1354,
+      "n_votes": 109913,
+      "n_deputes_votants": 642
+    },
+    {
+      "legislature": "15",
+      "n_scrutins": 4417,
+      "n_votes": 472631,
+      "n_deputes_votants": 651
+    },
+    {
+      "legislature": "16",
+      "n_scrutins": 4106,
+      "n_votes": 603813,
+      "n_deputes_votants": 962
+    },
+    {
+      "legislature": "17",
+      "n_scrutins": 8322,
+      "n_votes": 1255324,
+      "n_deputes_votants": 644
+    }
+  ],
+  "per_legislature_slices": {
+    "14": {
+      "deputes": 642,
+      "votes": 109913,
+      "scrutins": 1354
+    },
+    "15": {
+      "deputes": 651,
+      "votes": 472631,
+      "scrutins": 4417
+    },
+    "16": {
+      "deputes": 962,
+      "votes": 603813,
+      "scrutins": 4106
+    },
+    "17": {
+      "deputes": 577,
+      "votes": 1199651,
+      "scrutins": 8322
+    }
+  },
+  "l17_active_deputes": 577,
+  "l17_votes": 1199651,
+  "l17_scrutins": 8322,
+  "filters_for_ideal_model": {
+    "keep_positions": [
+      "pour",
+      "contre"
+    ],
+    "min_minority_share": 0.1,
+    "min_votes_per_deputy": 25
+  },
+  "l13_note": "No official Scrutins_13 dump currently published; slice omitted unless Scrutins_13.json.zip is present in raw/."
+}

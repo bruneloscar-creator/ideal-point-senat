@@ -1,0 +1,16 @@
+{
+  "legislature": "14",
+  "active_deputes": 642,
+  "model_deputes": 621,
+  "model_roll_calls": 638,
+  "model_rows": 89957,
+  "matrix_shape": [
+    621,
+    638
+  ],
+  "na_cells": 306241,
+  "date_min": "2012-07-03",
+  "date_max": "2016-11-24",
+  "min_minority_share": 0.1,
+  "min_votes_per_deputy": 25
+}

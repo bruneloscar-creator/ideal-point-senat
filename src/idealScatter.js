@@ -3,7 +3,11 @@
  * X = gauche → droite · Y élevé (RDPI / loin) en haut du canvas.
  */
 
-import { t, onLangChange, getLang } from './i18n.js';
+import { t, tForChamber, onLangChange, getLang } from './i18n.js';
+
+function activeChamber() {
+  return document.documentElement?.dataset?.chamber === 'assemblee' ? 'assemblee' : 'senat';
+}
 
 export const PARTY_ORDER = ['CRC', 'GEST', 'SOC', 'RDSE', 'LREM', 'NI', 'UC', 'RTLI', 'UMP'];
 
@@ -64,7 +68,7 @@ function normalizeSenator(raw) {
  * @returns {Promise<{ senators: object[], groupColors: Record<string,string>, meta: object|null }>}
  */
 export async function loadScatterSenators(url = '/assets/senators.json') {
-  const res = await fetch(`${url}?t=${Date.now()}`, { cache: 'no-store' });
+  const res = await fetch(url, { cache: 'force-cache' });
   if (!res.ok) throw new Error(`Impossible de charger ${url}`);
   const data = await res.json();
   const list = Array.isArray(data) ? data : data.senators;
@@ -77,11 +81,59 @@ export async function loadScatterSenators(url = '/assets/senators.json') {
 }
 
 /**
+ * Load `/assets/deputies.json` and pick one legislature period (default L17).
+ * @returns {Promise<{ senators: object[], groupColors: Record<string,string>, meta: object|null, period: object|null }>}
+ */
+export async function loadScatterDeputies(url = '/assets/deputies/manifest.json', periodId = null) {
+  const res = await fetch(url, { cache: 'force-cache' });
+  if (!res.ok) throw new Error(`Impossible de charger ${url}`);
+  const data = await res.json();
+  const periods = Array.isArray(data.periods) ? data.periods : [];
+  const want =
+    periodId ||
+    data.meta?.defaultPeriod ||
+    periods.find((p) => p?.fitted)?.id ||
+    periods[periods.length - 1]?.id;
+  const period = periods.find((p) => p.id === want) || null;
+  let list = data.deputiesByPeriod?.[want] || [];
+  let groupColors = data.groupColors || {};
+  if (!list.length && data.files?.[want]) {
+    const base = url.slice(0, url.lastIndexOf('/') + 1);
+    const periodRes = await fetch(`${base}${data.files[want]}`, { cache: 'force-cache' });
+    if (!periodRes.ok) throw new Error(`Impossible de charger la période ${want}`);
+    const periodData = await periodRes.json();
+    list = periodData.deputies || [];
+    groupColors = { ...groupColors, ...(periodData.groupColors || {}) };
+  }
+  if (!Array.isArray(list) || !list.length) throw new Error(`deputies.json vide (${want})`);
+  return {
+    senators: list.map(normalizeSenator),
+    groupColors,
+    meta: { ...(data.meta || {}), period, chamber: 'assemblee' },
+    period,
+  };
+}
+
+function meanIdealX(senators, key) {
+  const xs = senators
+    .filter((s) => partyKey(s) === key)
+    .map((s) => Number(s.idealX))
+    .filter(Number.isFinite);
+  if (!xs.length) return 0;
+  return xs.reduce((a, b) => a + b, 0) / xs.length;
+}
+
+/**
  * Fill an optional HTML legend (`<ul>`) with party swatches.
+ * Prefers Senate PARTY_ORDER when present; otherwise sorts by mean Ideal X (AN).
  */
 export function fillIdealLegend(legendEl, senators, groupColors = {}) {
   if (!legendEl || !senators?.length) return;
-  const parties = PARTY_ORDER.filter((p) => senators.some((s) => partyKey(s) === p));
+  const present = [...new Set(senators.map(partyKey).filter(Boolean))];
+  let parties = PARTY_ORDER.filter((p) => present.includes(p));
+  if (parties.length < Math.min(3, present.length)) {
+    parties = present.sort((a, b) => meanIdealX(senators, a) - meanIdealX(senators, b));
+  }
   legendEl.innerHTML = parties
     .map((p) => {
       const sample = senators.find((s) => partyKey(s) === p);
@@ -255,7 +307,7 @@ export function drawIdealScatter(canvas, senators, opts = {}) {
     ctx.arc(px, py, 2.2, 0, Math.PI * 2);
     ctx.fill();
 
-    const label = selected.name || t('scatter.senator');
+    const label = selected.name || tForChamber(activeChamber(), 'scatter.senator');
     ctx.font = '600 12px -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif';
     const tw = ctx.measureText(label).width;
     let lx = px + 16;

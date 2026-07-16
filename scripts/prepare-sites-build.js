@@ -16,6 +16,14 @@ await writeFile(
       url.pathname = '/assets/senators.json';
       request = new Request(url, request);
     }
+    if (url.pathname === '/data/deputies.json') {
+      url.pathname = '/assets/deputies.json';
+      request = new Request(url, request);
+    }
+    if (url.pathname.startsWith('/data/deputies/')) {
+      url.pathname = url.pathname.replace('/data/deputies/', '/assets/deputies/');
+      request = new Request(url, request);
+    }
     return env.ASSETS.fetch(request);
   },
 };

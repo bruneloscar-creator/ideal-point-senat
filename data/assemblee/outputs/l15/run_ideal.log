@@ -1,0 +1,106 @@
+Warning messages:
+1: package ‘ggplot2’ was built under R version 4.5.3 
+2: package ‘purrr’ was built under R version 4.5.3 
+3: package ‘dplyr’ was built under R version 4.5.3 
+legislature=15 out_dir=/Users/oscar/Downloads/test 3D/data/assemblee/outputs/l15
+matrix 640 x 3466
+Warning message:
+Setting row names on a tibble is deprecated. 
+The input rollcall object already has a dropInfo component,
+ meaning that it is the product of dropRollCall.
+ This summary and the execution of any current dropList
+ proceeds conditional on the previous dropList.
+
+Number of Legislators:		 640
+Number of Roll Call Votes:	 3466
+
+dropRollCall deleted no legislators 
+dropRollCall deleted no votes 
+
+Using the following codes to represent roll call votes:
+Yea:		 1 
+Nay:		 0 
+Abstentions:	 NA 
+
+
+Vote Summary:
+         Count Percent
+0 (nay) 213724    59.8
+1 (yea) 143759    40.2
+
+Use summary(an_rollcall,verbose=TRUE) for more detailed information.
+Warning message:
+Unknown or uninitialised column: `party`. 
+
+Computing lightweight start values (SVD + zero item params)...
+          used  (Mb) gc trigger  (Mb) limit (Mb) max used  (Mb)
+Ncells 1912111 102.2    3446087 184.1         NA  2613230 139.6
+Vcells 4499521  34.4   20121746 153.6      16384 20062891 153.1
+Fitting pscl::ideal (d=2, maxiter=1000, burnin=500, thin=25)...
+ideal: analysis of roll call data via Markov chain Monte Carlo methods.
+
+normalize option is only meaningful when d=1
+Subsetting rollcall object an_rollcall using dropList
+Using the following codes to represent roll call votes:
+Yea:		 1 
+Nay:		 0 
+Abstentions:	 NA 
+
+Ideal Point Estimation
+
+Number of Legislators		 640 
+Number of Items			 3466 
+
+checking for any user-supplied priors...
+setting prior means for ideal points to all zeros
+setting prior precisions for ideal points to all 1
+setting prior means for item parameters to all zeros
+setting prior precisions for item parameters to all 0.04
+
+checking start values...
+found user-supplied list in startvals
+starvals is a list containing:
+[1] "x" "b"
+using the following start values for ideal points (summary follows):
+       V1                V2          
+ Min.   :-2.3673   Min.   :-4.44987  
+ 1st Qu.:-0.9154   1st Qu.:-0.46335  
+ Median : 0.2617   Median : 0.09908  
+ Mean   : 0.0000   Mean   : 0.00000  
+ 3rd Qu.: 0.8104   3rd Qu.: 0.41718  
+ Max.   : 2.1826   Max.   : 3.68210  
+using the following start values for item parameters (summary follows):
+       V1          V2          V3   
+ Min.   :0   Min.   :0   Min.   :0  
+ 1st Qu.:0   1st Qu.:0   1st Qu.:0  
+ Median :0   Median :0   Median :0  
+ Mean   :0   Mean   :0   Mean   :0  
+ 3rd Qu.:0   3rd Qu.:0   3rd Qu.:0  
+ Max.   :0   Max.   :0   Max.   :0  
+
+Starting MCMC Iterations...
+
+Current Iteration: 50 (5% of 1000 iterations requested)
+Current Iteration: 100 (10% of 1000 iterations requested)
+Current Iteration: 150 (15% of 1000 iterations requested)
+Current Iteration: 200 (20% of 1000 iterations requested)
+Current Iteration: 250 (25% of 1000 iterations requested)
+Current Iteration: 300 (30% of 1000 iterations requested)
+Current Iteration: 350 (35% of 1000 iterations requested)
+Current Iteration: 400 (40% of 1000 iterations requested)
+Current Iteration: 450 (45% of 1000 iterations requested)
+Current Iteration: 500 (50% of 1000 iterations requested)
+Current Iteration: 550 (55% of 1000 iterations requested)
+Current Iteration: 600 (60% of 1000 iterations requested)
+Current Iteration: 650 (65% of 1000 iterations requested)
+Current Iteration: 700 (70% of 1000 iterations requested)
+Current Iteration: 750 (75% of 1000 iterations requested)
+Current Iteration: 800 (80% of 1000 iterations requested)
+Current Iteration: 850 (85% of 1000 iterations requested)
+Current Iteration: 900 (90% of 1000 iterations requested)
+Current Iteration: 950 (95% of 1000 iterations requested)
+Current Iteration: 1000 (100% of 1000 iterations requested)
+...computing posterior means for ideal points...done
+Flipped dim1 so left groups are on the left
+Wrote points_ideal_raw.csv
+Done legislature 15

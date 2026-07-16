@@ -1,0 +1,27 @@
+acteur_id,prenom,nom,date_naissance,ville_naissance,an_legislatures_mandat,n_assemblee_mandats,senat_date_debut,matricule,groupe_senat,groupe_senat_court,circonscription_senat,match_method,match_ok
+PA337633,Annick,Girardin,1964-08-03,Saint-Malo,14|15|13,5,2025-09-15,21032X,RDSE,RDSE,Saint-Pierre-et-Miquelon,name_unique,True
+PA608083,Brigitte,Bourguignon,1959-03-21,Boulogne-sur-Mer,14|15,3,2025-09-01,18045D,UC,UC,Pas-de-Calais,name_unique,True
+PA607489,Guillaume,Chevrollier,1974-10-27,Chateau Gontier,14,1,2023-10-02,18083K,UMP,Les Républicains,Mayenne,name_unique,True
+PA590034,Marie-Arlette,Carlotti,1952-01-21,Béziers,14,2,2023-10-04,12028B,SOC,SER,Bouches-du-Rhône,name_unique,True
+PA267075,Étienne,Blanc,1954-08-29,Givors,12|14|13,3,2020-10-01,17367Q,UMP,Les Républicains,Rhône,name_unique,True
+PA1744,Alain,Joyandet,1954-01-15,Dijon,13|12,3,2020-10-01,95041E,UMP,Les Républicains,Haute-Saône,name_unique,True
+PA712422,Karine,Daniel,1974-06-22,Nantes,14,1,2023-10-02,18395Y,SOC,SER,Loire-Atlantique,name_unique,True
+PA610850,Corinne,Narassiguin,1975-03-07,Le Port,14,1,2023-10-02,18231D,SOC,SER,Seine-Saint-Denis,name_unique,True
+PA606375,Émilienne,Poumirol,1950-07-25,Varilhes,14,1,2020-10-01,17965H,SOC,SER,Haute-Garonne,name_unique,True
+PA267673,Philippe,Folliot,1963-07-14,Albi,12|14|13|15,4,2020-10-01,17023S,UC,UC,Tarn,name_unique,True
+PA607761,Audrey,Linkenheld,1973-10-11,Strasbourg,14,1,2023-10-02,18207D,SOC,SER,Nord,name_unique,True
+PA643211,Franck,Montaugé,1961-09-14,Condom,14,1,2020-10-01,14257W,SOC,SER,Gers,name_unique,True
+PA267743,Édouard,Courtial,1973-06-28,Neuilly-sur-Seine,12|14|13,4,2023-10-02,11115U,UC,UC,Oise,name_unique,True
+PA330684,Valérie,Boyer,1962-06-11,Bourges,14|15|13,3,2020-10-01,17737W,UMP,Les Républicains,Bouches-du-Rhône,name_unique,True
+PA721166,Samantha,Cazebonne,1971-08-10,La Rochelle,15,2,2021-10-01,19057M,LREM,RDPI,Français établis hors de France (Série 2),name_unique,True
+PA345916,Sophie,Primas,1962-06-07,Saint-Mandé,13,1,2025-10-10,11090Q,UMP,Les Républicains,Yvelines,name_unique,True
+PA267907,Jean-Pierre,Grand,1950-11-18,Montpellier,13|12,2,2020-10-01,14211G,RTLI,Les Indépendants,Hérault,name_unique,True
+PA721742,Isabelle,Florennes,1967-08-02,Arras,15,1,2023-10-02,19111A,UC,UC,Hauts-de-Seine,name_unique,True
+PA605888,Annie,Le Houerou,1960-03-31,Plougonver,14,1,2020-10-01,18193Q,SOC,SER,Côtes-d'Armor,name_unique,True
+PA342564,Monique,Lubin,1963-07-16,"{'@xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance', '@xsi:nil': 'true'}",14,1,2023-10-02,17779H,SOC,SER,Landes,name_unique,True
+PA268048,Victorin,Lurel,1951-08-20,Vieux-Habitants,12|13|14,4,2023-10-02,12016W,SOC,SER,Guadeloupe,name_unique,True
+PA331381,Jacques,Grosperrin,1955-10-17,Baden-Baden,13,1,2020-10-06,14123H,UMP,Les Républicains,Doubs,name_unique,True
+PA267241,Stéphane,Demilly,1963-06-26,Albert,14|12|13|15,4,2020-10-01,17229F,UC,UC,Somme,name_unique,True
+PA267512,Alain,Marc,1957-01-29,Paris (XIV),14|13,2,2023-10-04,14111D,RTLI,Les Indépendants,Aveyron,name_unique,True
+PA1001,Marc-Philippe,Daubresse,1953-08-01,Lille,14|13|12,4,2023-10-02,04008A,UMP,Les Républicains,Nord,name_unique,True
+PA267081,Pascale,Gruny,1960-02-18,Cambrai,12|13,3,2020-10-06,14026U,UMP,Les Républicains,Aisne,name_unique,True

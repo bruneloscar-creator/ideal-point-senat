@@ -1,0 +1,2 @@
+legislature,active_deputes,model_deputes,model_roll_calls,model_rows,matrix_shape,na_cells,date_min,date_max,min_minority_share,min_votes_per_deputy
+15,651,640,3466,357483,"[640, 3466]",1860757,2017-07-04,2022-02-24,0.1,25

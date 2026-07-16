@@ -57,7 +57,7 @@ const dictionaries = {
     'header.hintLoaded': '{n} sénateurs · Ideal Point 2023–2026{nb} · Survol / clic sur un siège',
     'header.hintPlaceholder':
       'Données temporaires — chargement des sénateurs · Survol / clic',
-    'header.about': 'À propos <span aria-hidden="true">↗</span>',
+    'header.about': 'La méthode <span aria-hidden="true">↗</span>',
 
     'search.label': 'Rechercher un sénateur',
     'search.placeholder': 'Nom ou département…',
@@ -69,6 +69,27 @@ const dictionaries = {
     'controls.resetTitle': 'Réinitialiser la caméra',
     'controls.orbit': '<i aria-hidden="true">◉</i> Orbite guidée',
     'controls.orbitTitle': 'Vue depuis les bancs, vers la tribune',
+
+    'chamber.aria': 'Chambre parlementaire',
+    'chamber.label': 'Chambre',
+    'chamber.senat': 'Sénat',
+    'chamber.assemblee': 'Assemblée nationale',
+
+    'period.label': 'Législatures',
+    'period.aria': 'Évolution dans le temps — législatures',
+    'period.dates': '{start} → {end}',
+    'period.hint': '{n} députés · Ideal Point · {label}',
+    'header.hintLoadedAn': '{n} députés · {label}{nb} · Survol / clic sur un siège',
+    'header.titleAn': 'Ideal Point <span>Assemblée</span>',
+    'header.eyebrowAn': 'Visualisation politique · Assemblée nationale',
+    'header.metaSeatsAn': '577 sièges',
+    'search.labelAn': 'Rechercher un député',
+    'search.placeholderAn': 'Nom, groupe ou circonscription…',
+    'search.emptyAn': 'Aucun député trouvé',
+    'panel.idealSubAn': 'Nuage des députés · axes du modèle',
+    'panel.comparisonSubAn': 'Comparaison descriptive avec les députés de la législature',
+    'panel.scatterAriaAn': 'Nuage Ideal Point des députés',
+    'coach.titleAn': 'Cliquez sur un député',
 
     'panel.close': 'Fermer',
     'panel.eyebrow': 'Profil parlementaire',
@@ -85,15 +106,23 @@ const dictionaries = {
     'chart.distribution': 'Distribution de {label}',
     'chart.distributionDesc':
       'Boîte du premier au troisième quartile, médiane et moustaches du 5e au 95e percentile. Le sénateur est à {value}.',
+    'chart.distributionDescAn':
+      'Boîte du premier au troisième quartile, médiane et moustaches du 5e au 95e percentile. Le député est à {value}.',
     'chart.senator': 'Sénateur',
+    'chart.senatorAn': 'Député',
     'chart.senateMedian': 'Médiane Sénat',
+    'chart.senateMedianAn': 'Médiane Assemblée',
     'chart.groupMedian': 'Médiane groupe',
 
     'metric.abstention': 'Taux d’abstention',
     'metric.abstentionReadout':
       '<em>{pct} %</em> des sénateurs ont un taux inférieur.{groupBit}',
+    'metric.abstentionReadoutAn':
+      '<em>{pct} %</em> des députés ont un taux inférieur.{groupBit}',
     'metric.abstentionHint':
       'Part des votes publics pour lesquels le sénateur a voté « abstention ».',
+    'metric.abstentionHintAn':
+      'Part des votes publics pour lesquels le député a voté « abstention ».',
     'metric.abstentionLow': 'Faible',
     'metric.abstentionHigh': 'Élevée',
     'metric.typical': 'Dans la norme',
@@ -102,8 +131,12 @@ const dictionaries = {
     'metric.distGroup': 'Distance au groupe',
     'metric.distReadout':
       'Plus éloigné de son groupe que <em>{pct} %</em> des sénateurs.{groupBit}',
+    'metric.distReadoutAn':
+      'Plus éloigné de son groupe que <em>{pct} %</em> des députés.{groupBit}',
     'metric.distHint':
       'Distance dans l’espace Ideal entre le sénateur et le centroïde de son groupe parlementaire.',
+    'metric.distHintAn':
+      'Distance dans l’espace Ideal entre le député et le centroïde de son groupe parlementaire.',
     'metric.distNear': 'Très proche',
     'metric.distTypical': 'Distance courante',
     'metric.distFar': 'Plus isolé',
@@ -114,12 +147,15 @@ const dictionaries = {
     'metric.loyalty': 'Fidélité au groupe',
     'metric.loyaltyReadout':
       'Taux supérieur à celui de <em>{pct} %</em> des sénateurs.{groupBit}',
+    'metric.loyaltyReadoutAn':
+      'Taux supérieur à celui de <em>{pct} %</em> des députés.{groupBit}',
     'metric.loyaltyHint':
       'Part des votes pour/contre identiques à la position majoritaire du groupe.',
     'metric.loyaltyLow': 'Moins aligné',
     'metric.loyaltyTypical': 'Niveau courant',
     'metric.loyaltyHigh': 'Très aligné',
     'metric.loyaltyMissing': 'Donnée absente pour ce sénateur.',
+    'metric.loyaltyMissingAn': 'Donnée absente pour ce député.',
     'metric.loyaltyMissingHint':
       'Aucun proxy calculé : le champ groupLoyaltyPct n’est pas renseigné.',
 
@@ -140,6 +176,8 @@ const dictionaries = {
     'field.idealImputedYes': 'Oui (centroïde de groupe)',
     'field.nonVoting': 'Non-participation',
     'field.senatePage': 'Fiche Sénat',
+    'field.assembleePage': 'Fiche Assemblée',
+    'field.circonscription': 'Circonscription',
 
     'scatter.left': 'Gauche',
     'scatter.right': 'Droite',
@@ -148,6 +186,7 @@ const dictionaries = {
     'scatter.bottom': 'Bas',
     'scatter.bottomFull': 'Bas · proche',
     'scatter.senator': 'Sénateur',
+    'scatter.senatorAn': 'Député',
 
     'about.meta.title': 'À propos — Ideal Point Sénat · Oscar Brunel',
     'about.meta.description':
@@ -240,6 +279,116 @@ const dictionaries = {
 
     'about.footer.copy': 'Oscar Brunel · Ideal Point Sénat · Maquette hémicycle 3D',
     'about.footer.back': 'Retour à l’hémicycle',
+    'about.footer.assemblee': 'Note Assemblée',
+
+    /* ── À propos Assemblée nationale ───────────────────────── */
+    'aboutAn.meta.title': 'À propos — Ideal Point Assemblée · Oscar Brunel',
+    'aboutAn.meta.description':
+      'Note de recherche et maquette 3D : estimation des positions de vote à l’Assemblée nationale par modèle IDEAL (législatures 14e–17e).',
+    'aboutAn.meta.ogTitle': 'Ideal Point Assemblée — Méthode & données',
+    'aboutAn.meta.ogDescription':
+      'Comment plus d’un million de votes exploitables révèlent la géométrie politique de l’Assemblée.',
+
+    'aboutAn.navLabel': 'Navigation principale',
+    'aboutAn.navBackSmall': 'Assemblée · L14—L17',
+    'aboutAn.navProject': 'Projet',
+    'aboutAn.navMethod': 'Méthode',
+    'aboutAn.navLimits': 'Limites',
+    'aboutAn.navContact': 'Contact <span aria-hidden="true">↗</span>',
+
+    'aboutAn.hero.eyebrow': 'Note de recherche · Législatures 14e–17e',
+    'aboutAn.hero.title': 'Visualisation<br /><em>Assemblée</em>',
+    'aboutAn.hero.lede':
+      'Où se situent les députés les uns par rapport aux autres, d’après leurs seuls votes publics — estimé par un modèle Ideal Point, puis placé dans l’hémicycle.',
+    'aboutAn.hero.ctaPrimary': 'Explorer la maquette 3D <span aria-hidden="true">↗</span>',
+    'aboutAn.hero.ctaGhost': 'Comprendre le modèle',
+    'aboutAn.hero.statsLabel': 'Chiffres clés du modèle',
+    'aboutAn.hero.stat1': 'députés (modèle L17)',
+    'aboutAn.hero.stat2': 'scrutins retenus (L17)',
+    'aboutAn.hero.stat3': 'votes exploitables (L17)',
+    'aboutAn.hero.stat4': 'dimensions latentes',
+
+    'aboutAn.who.title': 'Qui je suis',
+    'aboutAn.who.body':
+      'Je suis <strong>Oscar Brunel</strong>. Cette note documente un travail de recherche sur les positions de vote à l’Assemblée nationale : un modèle Ideal Point bayésien multi-législatures, et une maquette 3D qui place chaque siège à sa position estimée à partir des scrutins publics.',
+
+    'aboutAn.project.title': 'Le projet',
+    'aboutAn.project.p1':
+      'Cette application croise deux objets : une <strong>maquette 3D</strong> des 577 sièges du Palais Bourbon, et une <strong>carte Ideal Point</strong> issue de l’analyse des votes sur les législatures 14e à 17e (curseur temporel dans la scène).',
+    'aboutAn.project.p2':
+      'Le principe relève de l’apprentissage statistique : à partir de la matrice des votes (députés × scrutins, « pour » / « contre »), un modèle place chaque député dans un espace à deux dimensions — sans étiquette de parti. Deux députés qui votent de façon similaire se retrouvent proches ; ceux qui s’opposent souvent sont éloignés.',
+    'aboutAn.project.note':
+      'Le résultat mesure une <em>position de vote révélée</em> sur un ensemble de votes publics sélectionnés. Ce n’est pas une mesure d’idéologie au sens large : un vote à l’Assemblée dépend aussi de la discipline de groupe, de la nature des textes et du calendrier parlementaire.',
+
+    'aboutAn.map.title': 'La carte Ideal Point',
+    'aboutAn.map.body':
+      'Chaque point est un député (17e législature). L’axe horizontal suit le clivage gauche–droite qui émerge des votes ; l’axe vertical place plus haut les profils proches du bloc majoritaire (EPR, DEM, HOR).',
+    'aboutAn.map.scatterAria': 'Nuage Ideal Point des députés (17e législature)',
+    'aboutAn.map.caption': 'Carte Ideal Point · 17e législature',
+    'aboutAn.map.legendAria': 'Légende des groupes',
+    'aboutAn.map.error': 'Carte temporairement indisponible',
+
+    'aboutAn.method.title': 'Ce qui a été fait',
+    'aboutAn.method.dataTitle': 'Données',
+    'aboutAn.method.dataBody':
+      'Quatre législatures sont fittées indépendamment (14e–17e) à partir des dumps officiels de scrutins. Sur la <strong>17e</strong>, après filtres — votes exprimés uniquement, scrutins déséquilibrés écartés, seuil de présence — le modèle porte sur <strong>575</strong> députés, <strong>7&nbsp;410</strong> scrutins et <strong>1&nbsp;007&nbsp;954</strong> votes exploitables.',
+    'aboutAn.method.howTitle': 'Comment Ideal Point marche',
+    'aboutAn.method.howP1':
+      'On part d’une matrice votes : députés × scrutins. Chaque case est «&nbsp;pour&nbsp;» ou «&nbsp;contre&nbsp;» ; abstention ou absence → case manquante.',
+    'aboutAn.method.howP2':
+      'Chaque député a une position latente <em>x<sub>i</sub></em> (ici en 2D) ; chaque scrutin a ses paramètres de discrimination et de difficulté. Style spatial / réponse à l’item (famille IDEAL / Clinton–Jackman–Rivers)&nbsp;: la probabilité de voter «&nbsp;oui&nbsp;» monte quand la position du député s’aligne avec le côté proposé — schématiquement&nbsp;: <code>P(oui) ≈ Φ(β′x<sub>i</sub> − α)</code>.',
+    'aboutAn.method.howP3':
+      'L’estimation MCMC (<code>pscl::ideal</code>) récupère les coordonnées ; les axes sont ensuite orientés (gauche–droite, majorité–opposition) pour la lecture.',
+    'aboutAn.method.idealTitle': 'Modèle IDEAL (mise en œuvre)',
+    'aboutAn.method.idealBody':
+      'Ici&nbsp;: 2 dimensions, 1&nbsp;000 itérations, 500 de rodage, thin 25. Votes codés 1&nbsp;=&nbsp;pour, 0&nbsp;=&nbsp;contre ; abstentions et absences = manquantes. L’orientation est fixée après estimation à partir des groupes de référence (gauche / droite / majorité).',
+    'aboutAn.method.readTitle': 'Lecture de l’espace',
+    'aboutAn.method.read1':
+      'La <strong>dimension 1</strong> correspond à un clivage gauche–droite qui émerge des votes eux-mêmes, sans avoir été imposé.',
+    'aboutAn.method.read2':
+      'La <strong>dimension 2</strong> capte un clivage résiduel <em>majorité / opposition</em>, distinct du gauche–droite (voir analyse ci-dessous).',
+    'aboutAn.method.read3':
+      'Les groupes forment des blocs distincts le long de l’axe horizontal, confirmant que le modèle reconstitue la structure politique de l’Assemblée à partir des seuls votes.',
+    'aboutAn.method.read4':
+      'En Assemblée sans majorité absolue, le soutien au bloc présidentiel structure fortement les votes — d’où une 2<sup>e</sup> dimension lisible comme majorité vs opposition.',
+    'aboutAn.method.axis2Title': 'Analyse de l’axe 2',
+    'aboutAn.method.axis2P1':
+      'Après orientation (audit L17), <strong>dim1 = gauche → droite</strong>. <strong>Dim2</strong> ne redouble pas cet axe : elle sépare plutôt le soutien à la majorité présidentielle (<strong>EPR</strong>, <strong>DEM</strong>, <strong>HOR</strong>) de l’opposition, dans une Assemblée sans majorité absolue.',
+    'aboutAn.method.axis2P2':
+      'Sur la 17<sup>e</sup> législature, les groupes de la majorité se situent haut sur dim2 (moyennes ≈&nbsp;0,36–0,50). Les oppositions (<strong>LFI-NFP</strong>, <strong>RN</strong>, etc.) sont plus bas. La corrélation avec le bloc majoritaire est forte sur dim2, alors que LFI et RN peuvent être proches sur cet axe tout en restant opposés sur dim1 — signature d’un clivage <em>orthogonal-ish</em> au gauche–droite.',
+    'aboutAn.method.axis2F1':
+      '<strong>Dim2 = clivage résiduel</strong> soutien / opposition à la majorité — pas un second axe gauche–droite.',
+    'aboutAn.method.axis2F2':
+      'Dim2 est <strong>plus faible</strong> que dim1 (APRE ≈&nbsp;0,45 vs ≈&nbsp;0,86) : ne pas la sur-interpréter comme «&nbsp;extrémisme&nbsp;».',
+    'aboutAn.method.axis2F3':
+      'Centre sur dim1 + haut sur dim2 = <strong>centristes de majorité</strong>, pas des profils «&nbsp;neutres&nbsp;».',
+    'aboutAn.method.axis2F4':
+      'Alignement Procrustes Sénat ↔ AN (L14) : <strong>corr(dim2) ≈&nbsp;0</strong> — la 2<sup>e</sup> dimension n’est pas partagée entre chambres ; seule dim1 se compare.',
+    'aboutAn.method.axis2Note':
+      'Les pondérations APRE réduisent encore le poids visuel de dim2 dans la carte pondérée. Lire dim2 comme un signal secondaire, utile pour la géométrie majorité / opposition, pas comme une échelle d’intensité idéologique.',
+    'aboutAn.method.vizTitle': 'Visualisation',
+    'aboutAn.method.vizBody':
+      'La maquette 3D place chaque député sur son siège et expose, au clic, sa position Ideal Point dans le nuage de l’hémicycle — pour relier le plancher de l’Assemblée à la géométrie des votes. Un curseur permet de passer d’une législature fittée à l’autre.',
+
+    'aboutAn.limits.title': 'Portée et limites',
+    'aboutAn.limits.1':
+      'Position de vote révélée sur scrutins publics sélectionnés — pas une idéologie complète ni l’activité hors hémicycle.',
+    'aboutAn.limits.2': 'La nature des textes mis au vote public influence les positions estimées.',
+    'aboutAn.limits.3':
+      'La discipline de groupe, structurellement forte, comprime les écarts internes et peut exagérer la cohésion apparente.',
+    'aboutAn.limits.4':
+      'Dim2 n’est pas un axe commun Sénat / Assemblée : ne pas comparer les hauteurs verticales d’une chambre à l’autre.',
+
+    'aboutAn.refs.title': 'Références',
+    'aboutAn.refs.intro': 'La méthodologie s’appuie notamment sur&nbsp;:',
+
+    'aboutAn.contact.title': 'Contact',
+    'aboutAn.contact.body': 'Pour toute question sur la méthode, les données ou la maquette :',
+    'aboutAn.contact.linkedin': 'LinkedIn — Oscar Brunel',
+
+    'aboutAn.footer.copy': 'Oscar Brunel · Ideal Point Assemblée · Maquette hémicycle 3D',
+    'aboutAn.footer.back': 'Retour à l’hémicycle',
+    'aboutAn.footer.senate': 'Note Sénat',
   },
 
   en: {
@@ -289,7 +438,7 @@ const dictionaries = {
     'header.hintLoaded': '{n} senators · Ideal Point 2023–2026{nb} · Hover / click a seat',
     'header.hintPlaceholder':
       'Temporary data — loading senators · Hover / click',
-    'header.about': 'About <span aria-hidden="true">↗</span>',
+    'header.about': 'Method <span aria-hidden="true">↗</span>',
 
     'search.label': 'Search for a senator',
     'search.placeholder': 'Name or département…',
@@ -301,6 +450,27 @@ const dictionaries = {
     'controls.resetTitle': 'Reset camera',
     'controls.orbit': '<i aria-hidden="true">◉</i> Guided orbit',
     'controls.orbitTitle': 'View from the benches, toward the tribune',
+
+    'chamber.aria': 'Parliamentary chamber',
+    'chamber.label': 'Chamber',
+    'chamber.senat': 'Senate',
+    'chamber.assemblee': 'National Assembly',
+
+    'period.label': 'Legislatures',
+    'period.aria': 'Timeline — legislatures',
+    'period.dates': '{start} → {end}',
+    'period.hint': '{n} deputies · Ideal Point · {label}',
+    'header.hintLoadedAn': '{n} deputies · {label}{nb} · Hover / click a seat',
+    'header.titleAn': 'Ideal Point <span>Assembly</span>',
+    'header.eyebrowAn': 'Political visualization · National Assembly',
+    'header.metaSeatsAn': '577 seats',
+    'search.labelAn': 'Search for a deputy',
+    'search.placeholderAn': 'Name, group or constituency…',
+    'search.emptyAn': 'No deputy found',
+    'panel.idealSubAn': 'Cloud of deputies · model axes',
+    'panel.comparisonSubAn': 'Descriptive comparison with deputies in this legislature',
+    'panel.scatterAriaAn': 'Ideal Point scatter of deputies',
+    'coach.titleAn': 'Click a deputy',
 
     'panel.close': 'Close',
     'panel.eyebrow': 'Parliamentary profile',
@@ -317,15 +487,23 @@ const dictionaries = {
     'chart.distribution': 'Distribution of {label}',
     'chart.distributionDesc':
       'Box from the first to third quartile, median, and whiskers from the 5th to 95th percentile. The senator is at {value}.',
+    'chart.distributionDescAn':
+      'Box from the first to third quartile, median, and whiskers from the 5th to 95th percentile. The deputy is at {value}.',
     'chart.senator': 'Senator',
+    'chart.senatorAn': 'Deputy',
     'chart.senateMedian': 'Senate median',
+    'chart.senateMedianAn': 'Assembly median',
     'chart.groupMedian': 'Group median',
 
     'metric.abstention': 'Abstention rate',
     'metric.abstentionReadout':
       '<em>{pct}%</em> of senators have a lower rate.{groupBit}',
+    'metric.abstentionReadoutAn':
+      '<em>{pct}%</em> of deputies have a lower rate.{groupBit}',
     'metric.abstentionHint':
       'Share of public votes on which the senator cast an abstention.',
+    'metric.abstentionHintAn':
+      'Share of public votes on which the deputy cast an abstention.',
     'metric.abstentionLow': 'Low',
     'metric.abstentionHigh': 'High',
     'metric.typical': 'Typical range',
@@ -334,8 +512,12 @@ const dictionaries = {
     'metric.distGroup': 'Distance to group',
     'metric.distReadout':
       'Farther from their group than <em>{pct}%</em> of senators.{groupBit}',
+    'metric.distReadoutAn':
+      'Farther from their group than <em>{pct}%</em> of deputies.{groupBit}',
     'metric.distHint':
       'Distance in Ideal space between the senator and their parliamentary group centroid.',
+    'metric.distHintAn':
+      'Distance in Ideal space between the deputy and their parliamentary group centroid.',
     'metric.distNear': 'Very close',
     'metric.distTypical': 'Typical distance',
     'metric.distFar': 'More isolated',
@@ -346,12 +528,15 @@ const dictionaries = {
     'metric.loyalty': 'Group loyalty',
     'metric.loyaltyReadout':
       'Rate higher than that of <em>{pct}%</em> of senators.{groupBit}',
+    'metric.loyaltyReadoutAn':
+      'Rate higher than that of <em>{pct}%</em> of deputies.{groupBit}',
     'metric.loyaltyHint':
       'Share of yea/nay votes matching the group majority position.',
     'metric.loyaltyLow': 'Less aligned',
     'metric.loyaltyTypical': 'Typical range',
     'metric.loyaltyHigh': 'Highly aligned',
     'metric.loyaltyMissing': 'No data for this senator.',
+    'metric.loyaltyMissingAn': 'No data for this deputy.',
     'metric.loyaltyMissingHint': 'No proxy computed: groupLoyaltyPct is missing.',
 
     'metric.seatGap': 'Fit with seat neighbourhood',
@@ -359,6 +544,8 @@ const dictionaries = {
       'Local gap larger than that of <em>{pct}%</em> of seats.',
     'metric.seatGapHint':
       'Standardised distance between the senator’s Ideal position and the median of their {n} physical neighbours. X and Y are scaled by their robust dispersion. Descriptive comparison, not a hypothesis test.',
+    'metric.seatGapHintAn':
+      'Standardised distance between the deputy’s Ideal position and the median of their {n} physical neighbours. X and Y are scaled by their robust dispersion. Descriptive comparison, not a hypothesis test.',
     'metric.seatValueUnit': 'standardised gap',
     'metric.seatVeryAligned': 'Very well aligned',
     'metric.seatTypical': 'Typical range',
@@ -371,6 +558,8 @@ const dictionaries = {
     'field.idealImputedYes': 'Yes (group centroid)',
     'field.nonVoting': 'Non-participation',
     'field.senatePage': 'Senate page',
+    'field.assembleePage': 'Assembly page',
+    'field.circonscription': 'Constituency',
 
     'scatter.left': 'Left',
     'scatter.right': 'Right',
@@ -379,6 +568,7 @@ const dictionaries = {
     'scatter.bottom': 'Bottom',
     'scatter.bottomFull': 'Bottom · near',
     'scatter.senator': 'Senator',
+    'scatter.senatorAn': 'Deputy',
 
     'about.meta.title': 'About — Senate Ideal Point · Oscar Brunel',
     'about.meta.description':
@@ -471,6 +661,116 @@ const dictionaries = {
 
     'about.footer.copy': 'Oscar Brunel · Senate Ideal Point · 3D hemicycle model',
     'about.footer.back': 'Back to the hemicycle',
+    'about.footer.assemblee': 'Assembly note',
+
+    /* ── About National Assembly ─────────────────────────────── */
+    'aboutAn.meta.title': 'About — Assembly Ideal Point · Oscar Brunel',
+    'aboutAn.meta.description':
+      'Research note and 3D model: estimating National Assembly voting positions with an IDEAL model (14th–17th legislatures).',
+    'aboutAn.meta.ogTitle': 'Assembly Ideal Point — Method & data',
+    'aboutAn.meta.ogDescription':
+      'How more than a million usable votes reveal the political geometry of the Assembly.',
+
+    'aboutAn.navLabel': 'Main navigation',
+    'aboutAn.navBackSmall': 'Assembly · L14—L17',
+    'aboutAn.navProject': 'Project',
+    'aboutAn.navMethod': 'Method',
+    'aboutAn.navLimits': 'Limits',
+    'aboutAn.navContact': 'Contact <span aria-hidden="true">↗</span>',
+
+    'aboutAn.hero.eyebrow': 'Research note · 14th–17th legislatures',
+    'aboutAn.hero.title': 'Assembly<br /><em>Visualization</em>',
+    'aboutAn.hero.lede':
+      'Where deputies stand relative to one another, from public votes alone — estimated with an Ideal Point model, then placed in the hemicycle.',
+    'aboutAn.hero.ctaPrimary': 'Explore the 3D model <span aria-hidden="true">↗</span>',
+    'aboutAn.hero.ctaGhost': 'Understand the model',
+    'aboutAn.hero.statsLabel': 'Model key figures',
+    'aboutAn.hero.stat1': 'deputies (L17 model)',
+    'aboutAn.hero.stat2': 'roll calls kept (L17)',
+    'aboutAn.hero.stat3': 'usable votes (L17)',
+    'aboutAn.hero.stat4': 'latent dimensions',
+
+    'aboutAn.who.title': 'Who I am',
+    'aboutAn.who.body':
+      'I am <strong>Oscar Brunel</strong>. This note documents research on National Assembly voting positions: a multi-legislature Bayesian Ideal Point model, and a 3D mock-up that places each seat at its estimated position from public roll calls.',
+
+    'aboutAn.project.title': 'The project',
+    'aboutAn.project.p1':
+      'This app brings together two objects: a <strong>3D model</strong> of the 577 seats in the Palais Bourbon, and an <strong>Ideal Point map</strong> from vote analysis across the 14th–17th legislatures (timeline slider in the scene).',
+    'aboutAn.project.p2':
+      'The idea is statistical learning: from the vote matrix (deputies × roll calls, yea / nay), a model places each deputy in a two-dimensional space — with no party labels. Deputies who vote alike end up close; those who often oppose sit far apart.',
+    'aboutAn.project.note':
+      'The result measures a <em>revealed voting position</em> on a selected set of public votes. It is not ideology in a broad sense: an Assembly vote also depends on group discipline, the nature of bills, and the parliamentary calendar.',
+
+    'aboutAn.map.title': 'The Ideal Point map',
+    'aboutAn.map.body':
+      'Each point is a deputy (17th legislature). The horizontal axis follows the left–right cleavage that emerges from the votes; the vertical axis places higher the profiles closer to the majority bloc (EPR, DEM, HOR).',
+    'aboutAn.map.scatterAria': 'Ideal Point cloud of deputies (17th legislature)',
+    'aboutAn.map.caption': 'Ideal Point map · 17th legislature',
+    'aboutAn.map.legendAria': 'Group legend',
+    'aboutAn.map.error': 'Map temporarily unavailable',
+
+    'aboutAn.method.title': 'What was done',
+    'aboutAn.method.dataTitle': 'Data',
+    'aboutAn.method.dataBody':
+      'Four legislatures are fitted independently (14th–17th) from official roll-call dumps. For the <strong>17th</strong>, after filters — expressed votes only, lopsided roll calls dropped, attendance threshold — the model covers <strong>575</strong> deputies, <strong>7,410</strong> roll calls and <strong>1,007,954</strong> usable votes.',
+    'aboutAn.method.howTitle': 'How Ideal Point works',
+    'aboutAn.method.howP1':
+      'Start from a vote matrix: deputies × roll calls. Each cell is yea or nay; abstention or absence → missing.',
+    'aboutAn.method.howP2':
+      'Each deputy has a latent position <em>x<sub>i</sub></em> (here in 2D); each roll call has discrimination and difficulty parameters. Spatial / item-response style (IDEAL family / Clinton–Jackman–Rivers): the probability of voting yea rises when the deputy’s position aligns with the proposed side — schematically: <code>P(yea) ≈ Φ(β′x<sub>i</sub> − α)</code>.',
+    'aboutAn.method.howP3':
+      'MCMC estimation (<code>pscl::ideal</code>) recovers the coordinates; axes are then oriented (left–right, majority–opposition) for reading.',
+    'aboutAn.method.idealTitle': 'IDEAL model (implementation)',
+    'aboutAn.method.idealBody':
+      'Here: 2 dimensions, 1,000 iterations, 500 burn-in, thin 25. Votes coded 1 = yea, 0 = nay; abstentions and absences = missing. Orientation is fixed after estimation from reference groups (left / right / majority).',
+    'aboutAn.method.readTitle': 'Reading the space',
+    'aboutAn.method.read1':
+      '<strong>Dimension 1</strong> matches a left–right cleavage that emerges from the votes themselves, without being imposed.',
+    'aboutAn.method.read2':
+      '<strong>Dimension 2</strong> captures a residual <em>majority / opposition</em> cleavage, distinct from left–right (see analysis below).',
+    'aboutAn.method.read3':
+      'Groups form distinct blocks along the horizontal axis, confirming that the model rebuilds the Assembly’s political structure from votes alone.',
+    'aboutAn.method.read4':
+      'In a hung Assembly, support for the presidential bloc strongly structures votes — hence a readable 2nd dimension as majority vs opposition.',
+    'aboutAn.method.axis2Title': 'Analysis of axis 2',
+    'aboutAn.method.axis2P1':
+      'After orientation (L17 audit), <strong>dim1 = left → right</strong>. <strong>Dim2</strong> does not repeat that axis: it mainly separates support for the presidential majority (<strong>EPR</strong>, <strong>DEM</strong>, <strong>HOR</strong>) from the opposition, in an Assembly without an absolute majority.',
+    'aboutAn.method.axis2P2':
+      'In the 17th legislature, majority groups sit high on dim2 (means ≈&nbsp;0.36–0.50). Oppositions (<strong>LFI-NFP</strong>, <strong>RN</strong>, etc.) sit lower. Correlation with the majority bloc is strong on dim2, while LFI and RN can look similar on that axis yet remain opposite on dim1 — a signature of a cleavage roughly orthogonal to left–right.',
+    'aboutAn.method.axis2F1':
+      '<strong>Dim2 = residual cleavage</strong> of support / opposition to the majority — not a second left–right axis.',
+    'aboutAn.method.axis2F2':
+      'Dim2 is <strong>weaker</strong> than dim1 (APRE ≈&nbsp;0.45 vs ≈&nbsp;0.86): do not over-read it as “extremism”.',
+    'aboutAn.method.axis2F3':
+      'Centre on dim1 + high on dim2 = <strong>majority centrists</strong>, not “neutral” profiles.',
+    'aboutAn.method.axis2F4':
+      'Senate ↔ Assembly Procrustes (L14): <strong>corr(dim2) ≈&nbsp;0</strong> — the 2nd dimension is not shared across chambers; only dim1 compares.',
+    'aboutAn.method.axis2Note':
+      'APRE weights further shrink dim2’s visual weight on the weighted map. Treat dim2 as a secondary signal for majority / opposition geometry, not as an ideological intensity scale.',
+    'aboutAn.method.vizTitle': 'Visualization',
+    'aboutAn.method.vizBody':
+      'The 3D model places each deputy on their seat and, on click, shows their Ideal Point in the hemicycle cloud — linking the Assembly floor to the geometry of votes. A slider moves between fitted legislatures.',
+
+    'aboutAn.limits.title': 'Scope and limits',
+    'aboutAn.limits.1':
+      'Revealed voting position on selected public roll calls — not a full ideology, nor activity outside the chamber.',
+    'aboutAn.limits.2': 'The nature of bills put to public vote shapes estimated positions.',
+    'aboutAn.limits.3':
+      'Strong group discipline compresses within-group gaps and can exaggerate apparent cohesion.',
+    'aboutAn.limits.4':
+      'Dim2 is not a shared Senate / Assembly axis: do not compare vertical heights across chambers.',
+
+    'aboutAn.refs.title': 'References',
+    'aboutAn.refs.intro': 'The methodology draws notably on:',
+
+    'aboutAn.contact.title': 'Contact',
+    'aboutAn.contact.body': 'For questions on the method, data, or model:',
+    'aboutAn.contact.linkedin': 'LinkedIn — Oscar Brunel',
+
+    'aboutAn.footer.copy': 'Oscar Brunel · Assembly Ideal Point · 3D hemicycle model',
+    'aboutAn.footer.back': 'Back to the hemicycle',
+    'aboutAn.footer.senate': 'Senate note',
   },
 };
 
@@ -517,6 +817,17 @@ export function t(key, vars) {
   return vars ? interpolate(raw, vars) : raw;
 }
 
+/** Same as `t`, but prefers `keyAn` when chamber is Assemblée. */
+export function tForChamber(chamber, key, vars) {
+  if (chamber === 'assemblee') {
+    const anKey = `${key}An`;
+    if (dictionaries.fr[anKey] != null || dictionaries.en?.[anKey] != null) {
+      return t(anKey, vars);
+    }
+  }
+  return t(key, vars);
+}
+
 export function applyI18n(root = document) {
   const scope = root instanceof Element || root === document ? root : document;
 
@@ -552,18 +863,15 @@ export function applyI18n(root = document) {
 
   document.documentElement.lang = currentLang;
 
-  const titleKey = document.body?.classList.contains('about-page')
-    ? 'about.meta.title'
-    : 'meta.title';
-  const descKey = document.body?.classList.contains('about-page')
-    ? 'about.meta.description'
-    : 'meta.description';
-  const ogTitleKey = document.body?.classList.contains('about-page')
-    ? 'about.meta.ogTitle'
-    : 'meta.ogTitle';
-  const ogDescKey = document.body?.classList.contains('about-page')
-    ? 'about.meta.ogDescription'
-    : 'meta.ogDescription';
+  const aboutPrefix = document.body?.classList.contains('about-assemblee-page')
+    ? 'aboutAn'
+    : document.body?.classList.contains('about-page')
+      ? 'about'
+      : null;
+  const titleKey = aboutPrefix ? `${aboutPrefix}.meta.title` : 'meta.title';
+  const descKey = aboutPrefix ? `${aboutPrefix}.meta.description` : 'meta.description';
+  const ogTitleKey = aboutPrefix ? `${aboutPrefix}.meta.ogTitle` : 'meta.ogTitle';
+  const ogDescKey = aboutPrefix ? `${aboutPrefix}.meta.ogDescription` : 'meta.ogDescription';
 
   if (dictionaries.fr[titleKey]) document.title = t(titleKey);
   const metaDesc = document.querySelector('meta[name="description"]');

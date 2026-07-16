@@ -1,0 +1,42 @@
+{
+  "ideal": {
+    "d": 2,
+    "maxiter": 1000,
+    "burnin": 500,
+    "thin": 25,
+    "impute": false,
+    "seed": 123,
+    "min_minority_share": 0.1,
+    "min_votes_per_deputy": 25
+  },
+  "orientation": {
+    "13": {
+      "left": ["SRC", "GDR", "NC"],
+      "right": ["UMP", "NI"],
+      "majority": ["UMP"]
+    },
+    "14": {
+      "left": ["SRC", "SER", "RRDP", "ECOLO", "GDR"],
+      "right": ["UMP", "LES-REP", "Les Républicains", "LR", "UDI"],
+      "majority": ["SRC", "SER"]
+    },
+    "15": {
+      "left": ["FI", "GDR", "SOC", "NG", "EDS"],
+      "right": ["LR", "UDI-AGIR", "UDI_AGIR", "UDI_I", "UDI", "AGIR-E", "LC"],
+      "majority": ["LAREM", "MODEM", "DEM"]
+    },
+    "16": {
+      "left": ["LFI-NUPES", "LFI", "GDR-NUPES", "GDR", "SOC", "ECOLO", "ECOS"],
+      "right": ["RN", "LR", "UDI", "UDDPLR"],
+      "majority": ["RE", "DEM", "HOR"]
+    },
+    "17": {
+      "left": ["LFI-NFP", "GDR", "SOC", "ECOS"],
+      "right": ["RN", "DR", "UDDPLR", "UDR"],
+      "majority": ["EPR", "DEM", "HOR"]
+    }
+  },
+  "notes": {
+    "13": "Official AN open-data repository has no Scrutins dump for legislature 13 (HTTP 404). NosDéputés 2007-2012 also exposes no nominative public votes. Pipeline supports L13 if a Scrutins_13.json.zip is added later."
+  }
+}

@@ -1,0 +1,27 @@
+Warning messages:
+1: package ‘ggplot2’ was built under R version 4.5.3 
+2: package ‘purrr’ was built under R version 4.5.3 
+3: package ‘dplyr’ was built under R version 4.5.3 
+loaded
+rows 1007954 
+matrix dim 575 7411 
+matrix ok 575 7410  NAs 3252796 
+rollcall ok
+
+Number of Legislators:		 575
+Number of Roll Call Votes:	 7410
+
+
+Using the following codes to represent roll call votes:
+Yea:		 1 
+Nay:		 0 
+Abstentions:	 NA 
+Not In Legislature:	 9 
+
+
+Vote Summary:
+         Count Percent
+0 (nay) 571320    56.7
+1 (yea) 436634    43.3
+
+Use summary(rc,verbose=TRUE) for more detailed information.

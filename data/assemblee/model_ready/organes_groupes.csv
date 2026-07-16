@@ -1,0 +1,64 @@
+organe_uid,code_type,libelle,libelle_abrege,libelle_abrev,legislature,date_debut,date_fin,position_politique,couleur
+PO270915,GP,Député-e-s Communistes et Républicains,CR,CR,12,,,,
+PO266900,GP,Députés n'appartenant à aucun groupe,NI,NI,12,,,,
+PO270907,GP,Socialiste,SOC,SOC,12,,,,
+PO270911,GP,Union pour la Démocratie Française,UDF,UDF,12,,,,
+PO270903,GP,Union pour un Mouvement Populaire,UMP,UMP,12,,,,
+PO389635,GP,Gauche démocrate et républicaine,GDR,GDR,13,,,Opposition,
+PO389639,GP,Nouveau Centre,NC,NC,13,,,Minoritaire,
+PO387155,GP,Députés n'appartenant à aucun groupe,NI,NI,13,,,,
+PO389507,GP,"Socialiste, radical, citoyen et divers gauche",S.R.C.,S.R.C.,13,,,Opposition,
+PO389395,GP,Union pour un Mouvement Populaire,UMP,UMP,13,,,Majoritaire,
+PO656014,GP,Écologiste,Écolo,ECOLO,14,,,Minoritaire,
+PO656018,GP,Gauche démocrate et républicaine,GDR,GDR,14,,,Minoritaire,
+PO707869,GP,Les Républicains,Les Républicains,LES-REP,14,,,Opposition,
+PO645633,GP,Non inscrit,NI,NI,14,,,,
+PO684957,GP,Rassemblement - Union pour un Mouvement Populaire,Rassemblement-UMP,R-UMP,14,,,Opposition,
+PO656022,GP,"Radical, républicain, démocrate et progressiste",RRDP,RRDP,14,,,Minoritaire,
+PO713077,GP,"Socialiste, écologiste et républicain",SER,SER,14,,,Majoritaire,
+PO656002,GP,"Socialiste, républicain et citoyen",SRC,SRC,14,,,Majoritaire,
+PO656010,GP,Union des démocrates et indépendants,UDI,UDI,14,,,Opposition,
+PO656006,GP,Union pour un Mouvement Populaire,UMP,UMP,14,,,Opposition,
+PO771923,GP,Agir ensemble,Agir ens,AGIR-E,15,,,Minoritaire,#C7C034
+PO774834,GP,Mouvement Démocrate (MoDem) et Démocrates apparentés,Dem,DEM,15,,,Minoritaire,#F26D22
+PO771789,GP,Écologie Démocratie Solidarité,EDS,EDS,15,,,Minoritaire,#3A673E
+PO730958,GP,La France insoumise,FI,FI,15,,,Opposition,#ED302C
+PO730940,GP,Gauche démocrate et républicaine,GDR,GDR,15,,,Opposition,#A41914
+PO730964,GP,La République en Marche,LaREM,LAREM,15,,,Majoritaire,#702A82
+PO730952,GP,"Les Constructifs : républicains, UDI, indépendants",LC,LC,15,,,Opposition,
+PO730934,GP,Les Républicains,LR,LR,15,,,Opposition,#1C2EFA
+PO759900,GP,Libertés et Territoires,LT,LT,15,,,Opposition,#66BF74
+PO730970,GP,Mouvement Démocrate et apparentés,MODEM,MODEM,15,,,Minoritaire,#F26D22
+PO730946,GP,Nouvelle Gauche,NG,NG,15,,,Opposition,
+PO723569,GP,Non inscrit,NI,NI,15,,,,#8D949A
+PO758835,GP,Socialistes et apparentés,SOC,SOC,15,,,Opposition,#D46CA9
+PO767217,GP,"UDI, Agir et Indépendants",UDI-AGIR,UDI-A-I,15,,,Minoritaire,#94B7E1
+PO744425,GP,"UDI, Agir et Indépendants",UDI-AGIR,UDI-AGIR,15,,,Opposition,
+PO765636,GP,UDI et Indépendants,UDI-I,UDI-I,15,,,Opposition,
+PO771889,GP,UDI et Indépendants,UDI-I,UDI_I,15,,,Opposition,#94B7E1
+PO800484,GP,Démocrate (MoDem et Indépendants),Dem,DEM,16,,,Minoritaire,#CE5215
+PO800526,GP,Écologiste - NUPES,Ecolo - NUPES,ECOLO,16,,,Opposition,#77AA79
+PO800502,GP,Gauche démocrate et républicaine - NUPES,GDR - NUPES,GDR-NUPES,16,,,Opposition,#991414
+PO800514,GP,Horizons et apparentés,HOR,HOR,16,,,Minoritaire,#32B3CA
+PO800490,GP,La France insoumise - Nouvelle Union Populaire écologique et sociale,LFI - NUPES,LFI-NUPES,16,,,Opposition,#E42313
+PO800532,GP,"Libertés, Indépendants, Outre-mer et Territoires",LIOT,LIOT,16,,,Opposition,#F8D434
+PO800508,GP,Les Républicains,LR,LR,16,,,Opposition,#4565AD
+PO793087,GP,Non inscrit,NI,NI,16,,,,#8D949A
+PO800538,GP,Renaissance,RE,RE,16,,,Majoritaire,#61468F
+PO800520,GP,Rassemblement National,RN,RN,16,,,Opposition,#35495E
+PO800496,GP,Socialistes et apparentés (membre de l’intergroupe NUPES),SOC,SOC,16,,,Opposition,#DF84B5
+PO830170,GP,Socialistes et apparentés,SOC,SOC-A,16,,,Opposition,#DF84B5
+PO845520,GP,À Droite,AD,AD,17,,,,#3367A7
+PO845454,GP,Les Démocrates,Dem,DEM,17,,,,#F07E26
+PO845425,GP,Droite Républicaine,DR,DR,17,,,,#8CB0DC
+PO845439,GP,Écologiste et Social,EcoS,ECOS,17,,,,#77AA79
+PO845407,GP,Ensemble pour la République,EPR,EPR,17,,,,#7B4591
+PO845514,GP,Gauche Démocrate et Républicaine,GDR,GDR,17,,,,#830E21
+PO845470,GP,Horizons & Indépendants,HOR,HOR,17,,,,#B5E2F9
+PO845413,GP,La France insoumise - Nouveau Front Populaire,LFI-NFP,LFI-NFP,17,,,,#C00D0D
+PO845485,GP,"Libertés, Indépendants, Outre-mer et Territoires",LIOT,LIOT,17,,,,#FFD96F
+PO840056,GP,Non inscrit,NI,NI,17,,,,#8D949A
+PO845401,GP,Rassemblement National,RN,RN,17,,,,#313567
+PO845419,GP,Socialistes et apparentés,SOC,SOC,17,,,,#F5B4CE
+PO872880,GP,Union des droites pour la République,UDR,UDDPLR,17,,,,#3367A7
+PO847173,GP,UDR,UDR,UDR,17,,,,#3367A7

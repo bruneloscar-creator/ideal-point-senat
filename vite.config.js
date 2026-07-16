@@ -14,6 +14,18 @@ function runtimeAssets() {
         if (pathname === '/assets/senators.json' || pathname === '/data/senators.json') {
           source = resolve(__dirname, 'public/data/senators.json');
           contentType = 'application/json; charset=utf-8';
+        } else if (
+          pathname === '/assets/deputies.json' ||
+          pathname === '/data/deputies.json'
+        ) {
+          source = resolve(__dirname, 'public/data/deputies.json');
+          contentType = 'application/json; charset=utf-8';
+        } else if (
+          pathname.startsWith('/assets/deputies/') ||
+          pathname.startsWith('/data/deputies/')
+        ) {
+          source = resolve(__dirname, 'public/data/deputies', basename(pathname));
+          contentType = 'application/json; charset=utf-8';
         } else if (pathname.startsWith('/textures/')) {
           source = resolve(__dirname, 'public/textures', basename(pathname));
           contentType = 'image/jpeg';
@@ -42,6 +54,19 @@ function runtimeAssets() {
         resolve(__dirname, 'public/data/senators.json'),
         resolve(clientDir, 'assets/senators.json')
       );
+      try {
+        await cp(
+          resolve(__dirname, 'public/data/deputies.json'),
+          resolve(clientDir, 'assets/deputies.json')
+        );
+        await cp(
+          resolve(__dirname, 'public/data/deputies'),
+          resolve(clientDir, 'assets/deputies'),
+          { recursive: true }
+        );
+      } catch {
+        /* optional until AN export exists */
+      }
       await cp(resolve(__dirname, 'public/textures'), resolve(clientDir, 'textures'), {
         recursive: true,
       });
@@ -66,6 +91,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         about: resolve(__dirname, 'about.html'),
+        aboutAssemblee: resolve(__dirname, 'about-assemblee.html'),
       },
     },
   },

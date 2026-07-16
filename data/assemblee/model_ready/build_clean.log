@@ -1,0 +1,102 @@
+WARN missing /Users/oscar/Downloads/test 3D/data/assemblee/raw/Scrutins_13.json.zip
+Parsing scrutins Scrutins_14.json.zip ...
+  -> 1,354 scrutins, 109,913 vote rows
+Parsing scrutins Scrutins_15.json.zip ...
+  -> 4,417 scrutins, 472,631 vote rows
+Parsing scrutins Scrutins_16.json.zip ...
+  -> 4,106 scrutins, 603,813 vote rows
+Parsing scrutins Scrutins_17.json.zip ...
+  -> 8,322 scrutins, 1,255,324 vote rows
+Parsing acteurs/organes AMO10_deputes_actifs_17.json.zip ...
+  -> scanned acteurs~577, organes~7,137
+Parsing acteurs/organes AMO10_deputes_actifs_16.json.zip ...
+  -> scanned acteurs~0, organes~6,059
+Parsing acteurs/organes AMO20_legislature_17.json.zip ...
+  -> scanned acteurs~1,061, organes~849
+Parsing acteurs/organes AMO30_historique.json.zip ...
+  -> scanned acteurs~3,116, organes~10,809
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/organes_groupes.csv (63 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/votes_deputes_all.csv.gz (2,441,681 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/scrutins_rollcalls_all.csv (18,199 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/deputes_all.csv (3,118 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/votes_deputes_l14.csv.gz (109,913 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/deputes_l14.csv (642 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/scrutins_rollcalls_l14.csv (1,354 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/votes_deputes_l15.csv.gz (472,631 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/deputes_l15.csv (651 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/scrutins_rollcalls_l15.csv (4,417 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/votes_deputes_l16.csv.gz (603,813 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/deputes_l16.csv (962 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/scrutins_rollcalls_l16.csv (4,106 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/votes_deputes_l17.csv.gz (1,199,651 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/deputes_l17.csv (577 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/scrutins_rollcalls_l17.csv (8,322 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/votes_deputes_actifs_l17.csv.gz (1,199,651 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/deputes_actifs_l17.csv (577 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/scrutins_rollcalls_l17.csv (8,322 rows)
+Wrote /Users/oscar/Downloads/test 3D/data/assemblee/model_ready/coverage_by_legislature.csv (4 rows)
+{
+  "created_at_utc": "2026-07-16T20:48:31.959706+00:00",
+  "source": "data.assemblee-nationale.fr open data dumps",
+  "raw_dir": "/Users/oscar/Downloads/test 3D/data/assemblee/raw",
+  "legislatures": [
+    {
+      "legislature": "14",
+      "n_scrutins": 1354,
+      "n_votes": 109913,
+      "n_deputes_votants": 642
+    },
+    {
+      "legislature": "15",
+      "n_scrutins": 4417,
+      "n_votes": 472631,
+      "n_deputes_votants": 651
+    },
+    {
+      "legislature": "16",
+      "n_scrutins": 4106,
+      "n_votes": 603813,
+      "n_deputes_votants": 962
+    },
+    {
+      "legislature": "17",
+      "n_scrutins": 8322,
+      "n_votes": 1255324,
+      "n_deputes_votants": 644
+    }
+  ],
+  "per_legislature_slices": {
+    "14": {
+      "deputes": 642,
+      "votes": 109913,
+      "scrutins": 1354
+    },
+    "15": {
+      "deputes": 651,
+      "votes": 472631,
+      "scrutins": 4417
+    },
+    "16": {
+      "deputes": 962,
+      "votes": 603813,
+      "scrutins": 4106
+    },
+    "17": {
+      "deputes": 577,
+      "votes": 1199651,
+      "scrutins": 8322
+    }
+  },
+  "l17_active_deputes": 577,
+  "l17_votes": 1199651,
+  "l17_scrutins": 8322,
+  "filters_for_ideal_model": {
+    "keep_positions": [
+      "pour",
+      "contre"
+    ],
+    "min_minority_share": 0.1,
+    "min_votes_per_deputy": 25
+  },
+  "l13_note": "No official Scrutins_13 dump currently published; slice omitted unless Scrutins_13.json.zip is present in raw/."
+}

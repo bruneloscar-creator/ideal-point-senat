@@ -7,52 +7,52 @@ import {
   partyKey,
   drawIdealScatter as drawIdealScatterCore,
   mountIdealScatter,
-  loadScatterSenators,
 } from './idealScatter.js';
 import {
   initI18n,
   mountLangToggle,
   onLangChange,
   t,
+  tForChamber,
   localeTag,
 } from './i18n.js';
+import {
+  SENAT_COLORS,
+  ASSEMBLEE_COLORS,
+  readStoredChamber,
+  storeChamber,
+  applyPaletteToMaterials,
+} from '../assemblee nationale 3D/theme.js';
+import { buildAssembleeArchitecture } from '../assemblee nationale 3D/assembleeChamber.js';
 
-const BACKGROUND_MODE = new URLSearchParams(window.location.search).get('background') === '1';
+const QUERY = new URLSearchParams(window.location.search);
+const BACKGROUND_MODE = QUERY.get('background') === '1';
+const DEBUG_MAPPING = QUERY.get('debugMapping') === '1';
 
 initI18n();
 document.querySelectorAll('[data-lang-host]').forEach((host) => mountLangToggle(host));
 
-/* ── Palette Sénat (fidèle à la photo) ─────────────────────── */
-const COLORS = {
-  /* Velours bordeaux / cramoisi des fauteuils */
-  velvet: 0x8b1c2b,
-  velvetDark: 0x681522,
-  velvetDeep: 0x31090f,
-  /* Bois acajou / chêne poli (boiseries + pupitres) */
-  wood: 0x57311d,
-  woodDark: 0x28150d,
-  woodPolish: 0x6b3b22,
-  woodLight: 0x7b4a2b,
-  gold: 0xb38a43,
-  goldBright: 0xd2ad62,
-  goldMuted: 0x806331,
-  carpet: 0x8b2231,
-  carpetDark: 0x661520,
-  marble: 0xf2ebe0,
-  marbleWarm: 0xe8dcc8,
-  curtain: 0x570b18,
-  deskTop: 0x1a1210,
-  deskLeather: 0x173327,
-  /* Marbre rouge des colonnes du fond */
-  marbleRed: 0x6b3a3a,
-  marbleCream: 0xe8dcc8,
-  paintWarm: 0x8b6a4a,
-  paintSky: 0x6a8aaa,
-  glass: 0xc8d8e8,
-  flagBlue: 0x002395,
-  flagRed: 0xed2939,
-  flagEuBlue: 0x003399,
-};
+/* ── Palette active (Sénat par défaut ; AN via basculeur) ───── */
+let chamberId = readStoredChamber();
+storeChamber(chamberId);
+const COLORS = { ...(chamberId === 'assemblee' ? ASSEMBLEE_COLORS : SENAT_COLORS) };
+const SENATORS_URL = '/assets/senators.json';
+const DEPUTIES_URL = '/assets/deputies.json';
+const DEPUTIES_MANIFEST_URL = '/assets/deputies/manifest.json';
+
+async function fetchCachedJson(url) {
+  const res = await fetch(url, { cache: 'force-cache' });
+  if (!res.ok) throw new Error(`Impossible de charger ${url}`);
+  return res.json();
+}
+
+/* Start the useful network request before constructing the 3D architecture. */
+let senatorPayloadPromise = chamberId === 'senat'
+  ? fetchCachedJson(SENATORS_URL).catch(() => null)
+  : null;
+let deputiesManifestPromise = chamberId === 'assemblee'
+  ? fetchCachedJson(DEPUTIES_MANIFEST_URL).catch(() => null)
+  : null;
 
 const canvas = document.getElementById('c');
 const IS_MOBILE_DEVICE = window.matchMedia('(max-width: 700px), (pointer: coarse)').matches;
@@ -64,7 +64,8 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, BACKGROUND_MODE ? 1 : (IS_MOBILE_DEVICE ? 1 : 1.25)));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = !IS_MOBILE_DEVICE;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+/* Soft shadows on hundreds of seat instances is a major GPU cost; PCF is enough here. */
+renderer.shadowMap.type = THREE.PCFShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = IS_MOBILE_DEVICE ? 1.55 : 1.48;
@@ -228,6 +229,12 @@ const mat = {
 
 const root = new THREE.Group();
 scene.add(root);
+/** Architecture de salle (reconstruite au changement Sénat / AN) */
+const archRoot = new THREE.Group();
+root.add(archRoot);
+/** Sièges + gradins (reconstruits si le nombre de places change) */
+const seatRoot = new THREE.Group();
+root.add(seatRoot);
 
 /* ── Textures photo (références Sénat) ─────────────────────── */
 const texLoader = new THREE.TextureLoader();
@@ -237,32 +244,38 @@ function loadTex(url) {
   t.anisotropy = Math.min(IS_MOBILE_DEVICE ? 2 : 4, renderer.capabilities.getMaxAnisotropy());
   return t;
 }
-const TEX = {
-  wallArt: loadTex('/textures/wall-art.jpg?v=clean2'),
-  paintL: loadTex('/textures/painting-left.jpg?v=clean2'),
-  paintR: loadTex('/textures/painting-right.jpg?v=clean2'),
-  marbleCream: loadTex('/textures/marble-cream.jpg?v=clean2'),
-  ceiling: loadTex('/textures/ceiling.jpg?v=clean3'),
-  skylight: loadTex('/textures/skylight.jpg?v=clean3'),
-  wood: loadTex('/textures/wood-panel.jpg?v=clean2'),
-};
-TEX.wood.wrapS = TEX.wood.wrapT = THREE.RepeatWrapping;
-TEX.wood.repeat.set(3, 2);
-TEX.ceiling.wrapS = TEX.ceiling.wrapT = THREE.RepeatWrapping;
-TEX.ceiling.repeat.set(5, 4);
-TEX.marbleCream.wrapS = TEX.marbleCream.wrapT = THREE.RepeatWrapping;
-TEX.marbleCream.repeat.set(2, 2);
+let TEX = null;
 
-/* Le veinage réel reste discret : il enrichit le bois sans l'éclaircir. */
-for (const [material, tint] of [
-  [mat.wood, 0xc49a7b],
-  [mat.woodDark, 0x8a624d],
-  [mat.woodPolish, 0xd3a078],
-  [mat.woodLight, 0xe0b18a],
-]) {
-  material.map = TEX.wood;
-  material.color.setHex(tint);
-  material.needsUpdate = true;
+function ensureSenatTextures() {
+  if (TEX) return TEX;
+  TEX = {
+    wallArt: loadTex('/textures/wall-art.jpg?v=clean2'),
+    paintL: loadTex('/textures/painting-left.jpg?v=clean2'),
+    paintR: loadTex('/textures/painting-right.jpg?v=clean2'),
+    marbleCream: loadTex('/textures/marble-cream.jpg?v=clean2'),
+    ceiling: loadTex('/textures/ceiling.jpg?v=clean3'),
+    skylight: loadTex('/textures/skylight.jpg?v=clean3'),
+    wood: loadTex('/textures/wood-panel.jpg?v=clean2'),
+  };
+  TEX.wood.wrapS = TEX.wood.wrapT = THREE.RepeatWrapping;
+  TEX.wood.repeat.set(3, 2);
+  TEX.ceiling.wrapS = TEX.ceiling.wrapT = THREE.RepeatWrapping;
+  TEX.ceiling.repeat.set(5, 4);
+  TEX.marbleCream.wrapS = TEX.marbleCream.wrapT = THREE.RepeatWrapping;
+  TEX.marbleCream.repeat.set(2, 2);
+
+  /* Le veinage réel reste discret : il enrichit le bois sans l'éclaircir. */
+  for (const [material, tint] of [
+    [mat.wood, 0xc49a7b],
+    [mat.woodDark, 0x8a624d],
+    [mat.woodPolish, 0xd3a078],
+    [mat.woodLight, 0xe0b18a],
+  ]) {
+    material.map = TEX.wood;
+    material.color.setHex(tint);
+    material.needsUpdate = true;
+  }
+  return TEX;
 }
 
 
@@ -309,6 +322,10 @@ function instanceStaticBoxes(container) {
   container.traverse((object) => {
     if (!object.isMesh || object.isInstancedMesh || object.geometry?.type !== 'BoxGeometry') return;
     if (Array.isArray(object.material) || object.userData?.noBatch) return;
+    /* Garder le mur d’honneur intact pour pouvoir le masquer en reculant la caméra. */
+    for (let p = object.parent; p; p = p.parent) {
+      if (p.userData?.honorWall) return;
+    }
     const key = [
       object.material.uuid,
       object.castShadow ? 1 : 0,
@@ -389,8 +406,33 @@ function getBlockRanges() {
 }
 
 /** Répartition exacte : 348 sièges sur 11 rangées (Sénat) */
-const SEATS_PER_TIER = [18, 22, 26, 28, 30, 32, 34, 36, 38, 40, 44];
-const TOTAL_SEATS = SEATS_PER_TIER.reduce((s, n) => s + n, 0); // 348
+const SENAT_SEATS_PER_TIER = [18, 22, 26, 28, 30, 32, 34, 36, 38, 40, 44];
+
+/** Scale the Senate tier pattern to an arbitrary seat count (AN ≈ 577+). */
+function seatsPerTierForCount(n) {
+  const target = Math.max(1, Math.round(Number(n) || 348));
+  const base = SENAT_SEATS_PER_TIER;
+  const scale = target / 348;
+  const tiers = base.map((x) => Math.max(1, Math.round(x * scale)));
+  let diff = target - tiers.reduce((a, b) => a + b, 0);
+  let i = tiers.length - 1;
+  let guard = 0;
+  while (diff !== 0 && guard < target * 4) {
+    if (diff > 0) {
+      tiers[i] += 1;
+      diff -= 1;
+    } else if (tiers[i] > 1) {
+      tiers[i] -= 1;
+      diff += 1;
+    }
+    i = (i - 1 + tiers.length) % tiers.length;
+    guard += 1;
+  }
+  return tiers;
+}
+
+let SEATS_PER_TIER = [...SENAT_SEATS_PER_TIER];
+let TOTAL_SEATS = SEATS_PER_TIER.reduce((s, n) => s + n, 0);
 
 function distributeSeatsInBlocks(count, ranges) {
   const lengths = ranges.map((r) => Math.max(0.001, r.end - r.start));
@@ -424,7 +466,7 @@ function seatAnglesForTier(count) {
 /* ── Sol & tapis rouge ─────────────────────────────────────── */
 function buildFloor() {
   const floor = box(52, 0.12, 42, mat.woodDark, 0, -0.06, 2);
-  root.add(floor);
+  archRoot.add(floor);
 
   const shape = new THREE.Shape();
   shape.absarc(0, 0, 9.5, Math.PI * 0.04, Math.PI * 0.96, false);
@@ -438,7 +480,7 @@ function buildFloor() {
   const carpet = new THREE.Mesh(carpetGeo, mat.carpet);
   carpet.position.set(0, 0.01, 0);
   carpet.receiveShadow = true;
-  root.add(carpet);
+  archRoot.add(carpet);
 
   const totalArc = ARC_END - ARC_START;
   for (const f of AISLE_FRAC) {
@@ -448,7 +490,7 @@ function buildFloor() {
       const strip = box(0.7, 0.02, 0.8, mat.carpet);
       strip.position.set(p.x, p.y, p.z);
       strip.rotation.y = p.rotY;
-      root.add(strip);
+      archRoot.add(strip);
     }
   }
 }
@@ -514,12 +556,14 @@ function buildSeats() {
     armWoodLMesh, armWoodRMesh, armPadLMesh, armPadRMesh, leatherMesh,
     seatBaseMesh, seatSkirtMesh, voteUnitMesh, namePlateMesh,
   ];
-  const shadowCasters = new Set([cushionMesh, backPadMesh, backTopMesh, seatBaseMesh]);
+  /* Shadows: one caster + a couple of receivers — full seat shadows crushed FPS. */
+  const shadowCasters = new Set([cushionMesh]);
+  const shadowReceivers = new Set([cushionMesh, leatherMesh, seatBaseMesh]);
   for (const m of seatMeshes) {
     m.castShadow = renderer.shadowMap.enabled && shadowCasters.has(m);
-    m.receiveShadow = true;
+    m.receiveShadow = renderer.shadowMap.enabled && shadowReceivers.has(m);
     m.frustumCulled = false;
-    root.add(m);
+    seatRoot.add(m);
   }
 
   let idx = 0;
@@ -551,7 +595,7 @@ function buildSeats() {
         Math.sin(aMid) * rMid
       );
       block.rotation.y = -aMid - Math.PI / 2;
-      root.add(block);
+      seatRoot.add(block);
 
       /* Surface supérieure (plateforme) */
       const top = box(segW, 0.055, depth * 0.98, mat.carpetDark);
@@ -561,7 +605,7 @@ function buildSeats() {
         Math.sin(aMid) * rMid
       );
       top.rotation.y = -aMid - Math.PI / 2;
-      root.add(top);
+      seatRoot.add(top);
     }
 
     /* Face avant du gradin (contremarche vers le centre) */
@@ -578,7 +622,7 @@ function buildSeats() {
         Math.sin(aMid) * rIn
       );
       riser.rotation.y = -aMid - Math.PI / 2;
-      root.add(riser);
+      seatRoot.add(riser);
     }
 
     /*
@@ -607,7 +651,7 @@ function buildSeats() {
         Math.sin(aMid) * deskFrontR
       );
       front.rotation.y = -aMid - Math.PI / 2;
-      root.add(front);
+      seatRoot.add(front);
 
       /* Panneau bas décoratif */
       const kick = box(segW, 0.12, 0.1, mat.woodDark);
@@ -617,7 +661,7 @@ function buildSeats() {
         Math.sin(aMid) * (deskFrontR + 0.02)
       );
       kick.rotation.y = -aMid - Math.PI / 2;
-      root.add(kick);
+      seatRoot.add(kick);
 
       const mould = box(segW, 0.045, 0.1, mat.woodDark);
       mould.position.set(
@@ -626,7 +670,7 @@ function buildSeats() {
         Math.sin(aMid) * (deskFrontR + 0.01)
       );
       mould.rotation.y = -aMid - Math.PI / 2;
-      root.add(mould);
+      seatRoot.add(mould);
 
       const top = box(segW, 0.05, 0.42, mat.woodPolish);
       top.position.set(
@@ -635,7 +679,7 @@ function buildSeats() {
         Math.sin(aMid) * deskTopR
       );
       top.rotation.y = -aMid - Math.PI / 2;
-      root.add(top);
+      seatRoot.add(top);
     }
 
     /* Dosseret derrière les sièges (ferme le gradin) */
@@ -654,7 +698,7 @@ function buildSeats() {
         Math.sin(aMid) * backR
       );
       backPanel.rotation.y = -aMid - Math.PI / 2;
-      root.add(backPanel);
+      seatRoot.add(backPanel);
     }
 
     /* Sièges sur la plateforme pleine */
@@ -745,12 +789,101 @@ function buildSeats() {
     pickMesh.setMatrixAt(i, dummy.matrix);
   }
   pickMesh.instanceMatrix.needsUpdate = true;
-  root.add(pickMesh);
+  seatRoot.add(pickMesh);
 
   const colorMeshes = [
     cushionMesh, cushionFrontMesh, backPadMesh, backTopMesh, armPadLMesh, armPadRMesh,
   ];
   return { seatCount: idx, seats, pickMesh, colorMeshes };
+}
+
+function clearSeats() {
+  while (seatRoot.children.length) {
+    const child = seatRoot.children[0];
+    seatRoot.remove(child);
+    disposeArchTree(child);
+  }
+}
+
+function setSeatLayoutForCount(n) {
+  SEATS_PER_TIER = seatsPerTierForCount(n);
+  TOTAL_SEATS = SEATS_PER_TIER.reduce((s, k) => s + k, 0);
+}
+
+function rebuildSeats(n) {
+  clearSeats();
+  setSeatLayoutForCount(n);
+  const next = buildSeats();
+  /* Desk / gradin boxes are individual meshes — batch them like architecture. */
+  instanceStaticBoxes(seatRoot);
+  canvas.dataset.seatCount = String(next.seatCount);
+  return next;
+}
+
+const ASSEMBLEE_SEAT_COUNT = 577;
+const SENAT_SEAT_COUNT = 348;
+const seatCache = { senat: null, assemblee: null };
+
+function detachSeatRoot() {
+  while (seatRoot.children.length) {
+    seatRoot.remove(seatRoot.children[0]);
+  }
+}
+
+/** Keep a stable hemicycle size; never grow seats to historical headcount. */
+function ensureChamberSeatLayout() {
+  const target = chamberId === 'assemblee' ? ASSEMBLEE_SEAT_COUNT : SENAT_SEAT_COUNT;
+  if (seatSystem?.chamberKey === chamberId && seatSystem.seats.length === target) {
+    return false;
+  }
+
+  /* Park the current layout so Sénat↔AN can swap without a full rebuild. */
+  if (seatSystem?.chamberKey && seatRoot.children.length) {
+    seatCache[seatSystem.chamberKey] = {
+      system: seatSystem,
+      children: [...seatRoot.children],
+    };
+    detachSeatRoot();
+  }
+
+  const cached = seatCache[chamberId];
+  if (cached?.system?.seats?.length === target) {
+    for (const child of cached.children) seatRoot.add(child);
+    seatSystem = cached.system;
+    canvas.dataset.seatCount = String(seatSystem.seatCount);
+    return true;
+  }
+
+  seatSystem = rebuildSeats(target);
+  seatSystem.chamberKey = chamberId;
+  seatCache[chamberId] = {
+    system: seatSystem,
+    children: [...seatRoot.children],
+  };
+  return true;
+}
+
+/**
+ * When a legislature has more deputies than physical seats, sample evenly
+ * across the Ideal-X spectrum so left AND right remain represented.
+ */
+function selectLegislatorsForSeats(senators, seatCount) {
+  if (!Array.isArray(senators) || !senators.length) return [];
+  if (senators.length <= seatCount) return senators;
+  const sorted = senators
+    .map((s, i) => ({ s, i, x: Number(s.idealX) || 0, y: Number(s.idealY) || 0 }))
+    .sort((a, b) => a.x - b.x || a.y - b.y || a.i - b.i);
+  const picked = [];
+  const used = new Set();
+  for (let i = 0; i < seatCount; i++) {
+    const idx = Math.round((i / (seatCount - 1)) * (sorted.length - 1));
+    let j = idx;
+    while (used.has(j) && j < sorted.length - 1) j += 1;
+    while (used.has(j) && j > 0) j -= 1;
+    used.add(j);
+    picked.push(sorted[j].s);
+  }
+  return picked;
 }
 
 /* ── Helpers artistiques ───────────────────────────────────── */
@@ -938,7 +1071,7 @@ function buildBureau() {
     g.add(fl);
   }
 
-  root.add(g);
+  archRoot.add(g);
 }
 
 /* ── Tribune des orateurs ──────────────────────────────────── */
@@ -965,7 +1098,7 @@ function buildOrator() {
   head.position.set(0.05, 1.85, 0.4);
   g.add(head);
 
-  root.add(g);
+  archRoot.add(g);
 }
 
 function buildBackdrop() {
@@ -1034,7 +1167,7 @@ function buildBackdrop() {
   g.add(artLight);
   g.add(artLight.target);
 
-  root.add(g);
+  archRoot.add(g);
 }
 
 /* Ailes latérales du mur d'honneur, sans recouvrir la photo centrale réelle. */
@@ -1081,7 +1214,7 @@ function buildHonorArchitecture() {
 
   g.add(box(23.6, 0.22, 0.38, mat.goldBright, 0, 11.18, wallZ + 0.08));
 
-  root.add(g);
+  archRoot.add(g);
 }
 
 function addCorinthianColumn(parent, x, z, yBase, height) {
@@ -1133,33 +1266,33 @@ function buildCurvedWall() {
     const low = box(segW, 3.4, 0.22, woodMat);
     low.position.set(x, 1.7, z);
     low.rotation.y = rotY;
-    root.add(low);
+    archRoot.add(low);
 
     for (const y of [0.42, 1.72, 3.05]) {
       const mould = box(segW, 0.055, 0.06, y === 1.72 ? mat.woodPolish : mat.goldMuted);
       mould.position.set(Math.cos(aMid) * (WALL_R - 0.22), y, Math.sin(aMid) * (WALL_R - 0.22));
       mould.rotation.y = rotY;
-      root.add(mould);
+      archRoot.add(mould);
     }
 
     /* Mur rouge derrière les galeries visiteurs */
     const red = box(segW, 8.6, 0.16, redWallMat);
     red.position.set(x, 7.9, z);
     red.rotation.y = rotY;
-    root.add(red);
+    archRoot.add(red);
 
     /* Corniche or */
     const cornice = box(segW, 0.2, 0.38, mat.gold);
     cornice.position.set(x, 12.3, z);
     cornice.rotation.y = rotY;
-    root.add(cornice);
+    archRoot.add(cornice);
   }
 
   /* Piliers or entre les travées visiteurs */
   for (let i = 0; i <= 10; i++) {
     const t = i / 10;
     const a = ARC_START + (ARC_END - ARC_START) * t;
-    addCorinthianColumn(root, Math.cos(a) * (WALL_R - 0.7), Math.sin(a) * (WALL_R - 0.7), 0, 11.8);
+    addCorinthianColumn(archRoot, Math.cos(a) * (WALL_R - 0.7), Math.sin(a) * (WALL_R - 0.7), 0, 11.8);
   }
 
   /* Globes muraux : ponctuation chaude visible dans les photos de la salle. */
@@ -1168,7 +1301,7 @@ function buildCurvedWall() {
     const sconce = makeWallSconce(i % 2 === 0);
     sconce.position.set(Math.cos(a) * (WALL_R - 0.48), 2.65, Math.sin(a) * (WALL_R - 0.48));
     sconce.rotation.y = -a + Math.PI / 2;
-    root.add(sconce);
+    archRoot.add(sconce);
   }
 }
 
@@ -1194,32 +1327,32 @@ function buildGalleries() {
       const floor = box(segW, 0.12, level.depth, mat.woodDark);
       floor.position.set(Math.cos(aMid) * level.r, level.y, Math.sin(aMid) * level.r);
       floor.rotation.y = rotY;
-      root.add(floor);
+      archRoot.add(floor);
 
       /* Tapis rouge */
       const carpet = box(segW * 0.92, 0.04, level.depth * 0.85, mat.carpet);
       carpet.position.set(Math.cos(aMid) * level.r, level.y + 0.08, Math.sin(aMid) * level.r);
       carpet.rotation.y = rotY;
-      root.add(carpet);
+      archRoot.add(carpet);
 
       /* Balustrade or (ouverte sur la salle) */
       const railR = level.r - level.depth * 0.48;
       const rail = box(segW * 0.98, 0.12, 0.12, mat.woodPolish);
       rail.position.set(Math.cos(aMid) * railR, level.y + 0.85, Math.sin(aMid) * railR);
       rail.rotation.y = rotY;
-      root.add(rail);
+      archRoot.add(rail);
 
       const railGold = box(segW * 0.96, 0.045, 0.09, mat.goldBright);
       railGold.position.set(Math.cos(aMid) * railR, level.y + 0.79, Math.sin(aMid) * railR);
       railGold.rotation.y = rotY;
-      root.add(railGold);
+      archRoot.add(railGold);
 
       for (let k = 0; k < 4; k++) {
         const tf = (k + 0.5) / 4;
         const ak = a0 + (a1 - a0) * tf;
         const bal = cyl(0.04, 0.045, 0.75, mat.gold, 8);
         bal.position.set(Math.cos(ak) * railR, level.y + 0.42, Math.sin(ak) * railR);
-        root.add(bal);
+        archRoot.add(bal);
       }
 
       /* Rideau rouge au fond de la travée */
@@ -1227,12 +1360,12 @@ function buildGalleries() {
       const curtain = box(segW * 0.88, 1.7, 0.08, mat.curtain);
       curtain.position.set(Math.cos(aMid) * backR, level.y + 1.55, Math.sin(aMid) * backR);
       curtain.rotation.y = rotY;
-      root.add(curtain);
+      archRoot.add(curtain);
 
       const lintel = box(segW * 0.94, 0.12, 0.16, mat.goldMuted);
       lintel.position.set(Math.cos(aMid) * backR, level.y + 2.42, Math.sin(aMid) * backR);
       lintel.rotation.y = rotY;
-      root.add(lintel);
+      archRoot.add(lintel);
 
       /* Petits sièges visiteurs (rouges) */
       for (let s = 0; s < 3; s++) {
@@ -1242,11 +1375,11 @@ function buildGalleries() {
         const seat = box(0.38, 0.12, 0.36, mat.velvet);
         seat.position.set(Math.cos(as) * sr, level.y + 0.28, Math.sin(as) * sr);
         seat.rotation.y = -as - Math.PI / 2;
-        root.add(seat);
+        archRoot.add(seat);
         const back = box(0.38, 0.4, 0.08, mat.velvetDark);
         back.position.set(Math.cos(as) * (sr + 0.18), level.y + 0.5, Math.sin(as) * (sr + 0.18));
         back.rotation.y = -as - Math.PI / 2;
-        root.add(back);
+        archRoot.add(back);
       }
     }
   }
@@ -1259,12 +1392,31 @@ const ROOF = {
   layers: [],
 };
 
+/** Mur d’honneur AN : masqué quand la caméra recule derrière le perchoir. */
+const HONOR_WALL = {
+  group: null,
+  z: -7.88,
+};
+
+let lastRoofExterior = null;
+let lastWallExterior = null;
 function updateRoofTransparency() {
   /* Above the ceiling plane → exterior: see into the hemicycle */
-  const exterior = camera.position.y >= ROOF.y - 0.9;
-  for (const layer of ROOF.layers) {
-    layer.mat.opacity = exterior ? layer.outside : layer.inside;
-    layer.mat.depthWrite = !exterior;
+  const roofExterior = camera.position.y >= ROOF.y - 0.9;
+  if (roofExterior !== lastRoofExterior) {
+    lastRoofExterior = roofExterior;
+    for (const layer of ROOF.layers) {
+      layer.mat.opacity = roofExterior ? layer.outside : layer.inside;
+      layer.mat.depthWrite = !roofExterior;
+    }
+  }
+
+  /* Face aux parlementaires + recul derrière le mur de la présidente → voir les sièges, pas le mur. */
+  const wallExterior =
+    chamberId === 'assemblee' && camera.position.z < HONOR_WALL.z - 0.35;
+  if (wallExterior !== lastWallExterior) {
+    lastWallExterior = wallExterior;
+    if (HONOR_WALL.group) HONOR_WALL.group.visible = !wallExterior;
   }
 }
 
@@ -1290,25 +1442,25 @@ function buildCeiling() {
   ceiling.rotation.x = -Math.PI / 2;
   ceiling.position.set(0, ceilY, 4);
   ceiling.receiveShadow = true;
-  root.add(ceiling);
+  archRoot.add(ceiling);
 
   const ring = new THREE.Mesh(new THREE.TorusGeometry(25.2, 0.2, 8, 80), mat.gold);
   ring.rotation.x = Math.PI / 2;
   ring.position.set(0, ceilY - 0.12, 4);
-  root.add(ring);
+  archRoot.add(ring);
 
   /* Anneaux moulurés et rosaces : ils cassent l'effet de plafond plat. */
   for (const [radius, tube] of [[9.2, 0.12], [14.4, 0.1], [19.5, 0.12], [23.6, 0.09]]) {
     const band = new THREE.Mesh(new THREE.TorusGeometry(radius, tube, 8, 96), radius === 19.5 ? mat.goldBright : mat.goldMuted);
     band.rotation.x = Math.PI / 2;
     band.position.set(0, ceilY - 0.16, 4);
-    root.add(band);
+    archRoot.add(band);
   }
   for (let i = 0; i < 28; i++) {
     const a = (i / 28) * Math.PI * 2;
     const rosette = cyl(0.2, 0.2, 0.09, i % 2 ? mat.goldMuted : mat.goldBright, 12);
     rosette.position.set(Math.cos(a) * 21.7, ceilY - 0.2, 4 + Math.sin(a) * 21.7);
-    root.add(rosette);
+    archRoot.add(rosette);
   }
 
   /* Emprise sombre sous la verrière (lit le demi-cercle) */
@@ -1324,7 +1476,7 @@ function buildCeiling() {
   const recess = new THREE.Mesh(new THREE.CircleGeometry(skyR + 0.15, 56, 0, Math.PI), recessMat);
   recess.rotation.x = -Math.PI / 2;
   recess.position.set(0, ceilY - 0.08, skyZ);
-  root.add(recess);
+  archRoot.add(recess);
 
   const skyGroup = new THREE.Group();
   skyGroup.position.set(0, ceilY - 0.12, skyZ);
@@ -1387,7 +1539,7 @@ function buildCeiling() {
   const skyLight = new THREE.PointLight(0xe8f1ff, 22, 42, 1.35);
   skyLight.position.set(0, -1.2, skyR * 0.4);
   skyGroup.add(skyLight);
-  root.add(skyGroup);
+  archRoot.add(skyGroup);
 
   for (const [lx, lz] of [[-8, 10], [8, 10], [0, 15]]) {
     const chand = new THREE.Group();
@@ -1404,7 +1556,7 @@ function buildCeiling() {
     const light = new THREE.PointLight(0xffefd4, 6, 9, 2);
     light.position.y = -0.06;
     chand.add(light);
-    root.add(chand);
+    archRoot.add(chand);
   }
 }
 
@@ -1461,23 +1613,551 @@ function buildLights() {
   scene.add(seatFillR);
 }
 
-/* ── Assemblage ────────────────────────────────────────────── */
-buildFloor();
-const seatSystem = buildSeats();
-canvas.dataset.seatCount = String(seatSystem.seatCount);
-buildBureau();
-buildOrator();
-buildBackdrop();
-buildHonorArchitecture();
-buildCurvedWall();
-buildGalleries();
-buildCeiling();
-instanceStaticBoxes(root);
-buildLights();
+/* ── Assemblage architecture (Sénat ou Assemblée) ──────────── */
+function disposeArchTree(object) {
+  const sharedMats = new Set(Object.values(mat));
+  const sharedGeos = new Set([
+    ...boxGeometryCache.values(),
+    ...cylinderGeometryCache.values(),
+  ]);
+  object.traverse((child) => {
+    if (child.geometry && !sharedGeos.has(child.geometry)) {
+      child.geometry.dispose();
+    }
+    if (!child.material) return;
+    const list = Array.isArray(child.material) ? child.material : [child.material];
+    for (const m of list) {
+      if (sharedMats.has(m)) continue;
+      if (m.map && (m.map.isCanvasTexture || m.userData?.disposeMap)) {
+        m.map.dispose();
+      }
+      m.dispose();
+    }
+  });
+}
+
+function clearArchitecture() {
+  while (archRoot.children.length) {
+    const child = archRoot.children[0];
+    archRoot.remove(child);
+    disposeArchTree(child);
+  }
+  ROOF.layers.length = 0;
+}
+
+function buildSenatArchitecture() {
+  ensureSenatTextures();
+  buildFloor();
+  buildBureau();
+  buildOrator();
+  buildBackdrop();
+  buildHonorArchitecture();
+  buildCurvedWall();
+  buildGalleries();
+  buildCeiling();
+}
+
+function chamberHelpers() {
+  return {
+    parent: archRoot,
+    box,
+    cyl,
+    mat,
+    ROOF,
+    HONOR_WALL,
+    IS_MOBILE_DEVICE,
+    IS_MOBILE: IS_MOBILE_DEVICE,
+    ARC_START,
+    ARC_END,
+    alongArc,
+    AISLE_FRAC,
+    makeStatue,
+    makeClock,
+    makeWallSconce,
+    makeFlag,
+    addCorinthianColumn,
+  };
+}
 
 /* ── Données sénateurs + mapping idéal → sièges ─────────────── */
-const SENATORS_URL = '/assets/senators.json';
 const DEFAULT_SEAT_COLOR = new THREE.Color(COLORS.velvet);
+
+function applyChamberVisuals(id) {
+  const palette = id === 'assemblee' ? ASSEMBLEE_COLORS : SENAT_COLORS;
+  Object.assign(COLORS, palette);
+  applyPaletteToMaterials(mat, palette, id);
+  DEFAULT_SEAT_COLOR.setHex(palette.velvet);
+  scene.background = new THREE.Color(palette.sceneBg || 0x1b0d0b);
+  scene.fog = new THREE.Fog(palette.sceneBg || 0x1b0d0b, 62, 108);
+  document.documentElement.dataset.chamber = id;
+}
+
+const archCache = { senat: null, assemblee: null };
+const roofCache = { senat: null, assemblee: null };
+
+function detachArchitecture() {
+  while (archRoot.children.length) {
+    archRoot.remove(archRoot.children[0]);
+  }
+  ROOF.layers.length = 0;
+  HONOR_WALL.group = null;
+  lastRoofExterior = null;
+  lastWallExterior = null;
+}
+
+function bindHonorWallFromArch() {
+  HONOR_WALL.group =
+    archRoot.children.find((c) => c.userData?.honorWall === true) || null;
+  if (HONOR_WALL.group) HONOR_WALL.group.visible = true;
+}
+
+function buildChamberArchitecture(id) {
+  applyChamberVisuals(id);
+  detachArchitecture();
+
+  if (archCache[id]?.length) {
+    for (const child of archCache[id]) archRoot.add(child);
+    if (roofCache[id]?.length) ROOF.layers.push(...roofCache[id]);
+    bindHonorWallFromArch();
+    return;
+  }
+
+  if (id === 'assemblee') {
+    buildAssembleeArchitecture(chamberHelpers());
+  } else {
+    buildSenatArchitecture();
+  }
+  instanceStaticBoxes(archRoot);
+  archCache[id] = [...archRoot.children];
+  roofCache[id] = [...ROOF.layers];
+  bindHonorWallFromArch();
+}
+
+buildChamberArchitecture(chamberId);
+let seatSystem = rebuildSeats(chamberId === 'assemblee' ? ASSEMBLEE_SEAT_COUNT : SENAT_SEAT_COUNT);
+seatSystem.chamberKey = chamberId;
+seatCache[chamberId] = {
+  system: seatSystem,
+  children: [...seatRoot.children],
+};
+buildLights();
+
+/* ── Données multi-chambre / timeline AN ─────────────────────── */
+let assembleePayload = null;
+const assembleePeriodPromises = new Map();
+let currentPeriodId = null;
+let periodLoadToken = 0;
+let allSenators = [];
+let groupColors = {};
+
+function setChamber(id, { persist = true } = {}) {
+  if (id !== 'senat' && id !== 'assemblee') return;
+  if (id === chamberId && archRoot.children.length) {
+    syncChamberSwitchUI();
+    syncPeriodSliderUI();
+    return;
+  }
+  window.clearTimeout(periodApplyTimer);
+  periodLoadToken += 1;
+  periodPreviewId = null;
+  chamberId = id;
+  if (persist) storeChamber(id);
+  buildChamberArchitecture(id);
+  syncChamberSwitchUI();
+  canvas.dataset.chamber = id;
+  syncPeriodSliderUI();
+  loadChamberData().catch((err) => console.warn('loadChamberData failed', err));
+}
+
+function syncChamberSwitchUI() {
+  const rootEl = document.getElementById('chamber-switch');
+  if (!rootEl) return;
+  rootEl.querySelectorAll('[data-chamber]').forEach((btn) => {
+    const active = btn.getAttribute('data-chamber') === chamberId;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+}
+
+document.getElementById('chamber-switch')?.addEventListener('click', (event) => {
+  const btn = event.target.closest('[data-chamber]');
+  if (!btn) return;
+  setChamber(btn.getAttribute('data-chamber'));
+});
+syncChamberSwitchUI();
+
+function fittedAssembleePeriods() {
+  const periods = assembleePayload?.periods || [];
+  return periods.filter((p) => p?.fitted);
+}
+
+function formatPeriodDate(iso, fallback) {
+  if (!iso) return fallback || '…';
+  const d = String(iso);
+  if (/^\d{4}-\d{2}-\d{2}/.test(d)) {
+    const [y, m, day] = d.slice(0, 10).split('-');
+    return `${day}/${m}/${y}`;
+  }
+  return d;
+}
+
+function periodDisplayLabel(period) {
+  const english = document.documentElement.lang?.toLowerCase().startsWith('en');
+  return english ? period?.labelEn || period?.label || '' : period?.label || '';
+}
+
+function periodShortLabel(period) {
+  const number = Number(period?.legislature);
+  const english = document.documentElement.lang?.toLowerCase().startsWith('en');
+  if (!Number.isFinite(number)) return period?.startLabel || '';
+  if (!english) return `${number}e`;
+  const mod100 = number % 100;
+  const suffix = mod100 >= 11 && mod100 <= 13
+    ? 'th'
+    : ({ 1: 'st', 2: 'nd', 3: 'rd' }[number % 10] || 'th');
+  return `${number}${suffix}`;
+}
+
+function syncPeriodSliderUI() {
+  const rootEl = document.getElementById('period-slider');
+  const range = document.getElementById('period-range');
+  const ticks = document.getElementById('period-ticks');
+  const datesEl = document.getElementById('period-dates');
+  const currentEl = document.getElementById('period-current');
+  if (!rootEl || !range) return;
+
+  const show = chamberId === 'assemblee';
+  rootEl.hidden = !show;
+  if (!show) return;
+
+  const periods = fittedAssembleePeriods();
+  if (!periods.length) {
+    rootEl.hidden = true;
+    return;
+  }
+  if (!currentPeriodId || !periods.some((p) => p.id === currentPeriodId)) {
+    currentPeriodId =
+      assembleePayload?.meta?.defaultPeriod &&
+      periods.some((p) => p.id === assembleePayload.meta.defaultPeriod)
+        ? assembleePayload.meta.defaultPeriod
+        : periods[periods.length - 1].id;
+  }
+  const idx = Math.max(0, periods.findIndex((p) => p.id === currentPeriodId));
+  range.min = '0';
+  range.max = String(Math.max(0, periods.length - 1));
+  range.value = String(idx);
+  range.disabled = periods.length < 2;
+
+  if (ticks) {
+    ticks.innerHTML = periods
+      .map((p, i) => {
+        const years = `${p.startLabel || '…'}—${p.endLabel || '…'}`;
+        const active = i === idx;
+        return `<button type="button" class="period-tick${active ? ' is-active' : ''}" data-period-idx="${i}" aria-pressed="${active}" aria-label="${periodDisplayLabel(p)} · ${years}"><span>${periodShortLabel(p)}</span><small>${years}</small></button>`;
+      })
+      .join('');
+  }
+  const period = periods[idx];
+  if (currentEl) {
+    currentEl.textContent = periodDisplayLabel(period);
+  }
+  if (datesEl && period) {
+    const start = formatPeriodDate(period.start || period.dateMin, period.startLabel);
+    const end = period.end
+      ? formatPeriodDate(period.end, period.endLabel || '…')
+      : period.endLabel || '…';
+    datesEl.textContent = t('period.dates', { start, end });
+  }
+}
+
+async function loadDeputiesPayload(retries = 4, delayMs = 300) {
+  if (assembleePayload?.periods) return assembleePayload;
+  for (let i = 0; i < retries; i++) {
+    try {
+      let data = null;
+      try {
+        data = await deputiesManifestPromise;
+        deputiesManifestPromise = null;
+        if (!data) data = await fetchCachedJson(DEPUTIES_MANIFEST_URL);
+      } catch {
+        deputiesManifestPromise = null;
+      }
+      if (Array.isArray(data?.periods)) {
+        assembleePayload = {
+          ...data,
+          deputiesByPeriod: {},
+        };
+        return assembleePayload;
+      }
+
+      /* Backward-compatible fallback for an older deployment. */
+      const legacy = await fetchCachedJson(DEPUTIES_URL);
+      if (legacy?.deputiesByPeriod) {
+        assembleePayload = legacy;
+        return legacy;
+      }
+    } catch {
+      /* retry */
+    }
+    await sleep(delayMs);
+  }
+  return null;
+}
+
+async function loadDeputiesPeriod(periodId) {
+  if (!assembleePayload) return [];
+  const cached = assembleePayload.deputiesByPeriod?.[periodId];
+  if (Array.isArray(cached) && cached.length) return cached;
+  if (assembleePeriodPromises.has(periodId)) return assembleePeriodPromises.get(periodId);
+
+  const fileName = assembleePayload.files?.[periodId] || `${periodId}.json`;
+  const promise = fetchCachedJson(`/assets/deputies/${fileName}`)
+    .then((data) => {
+      const list = Array.isArray(data?.deputies) ? data.deputies : [];
+      if (!assembleePayload.deputiesByPeriod) assembleePayload.deputiesByPeriod = {};
+      assembleePayload.deputiesByPeriod[periodId] = list;
+      if (data?.groupColors) {
+        assembleePayload.groupColors = {
+          ...(assembleePayload.groupColors || {}),
+          ...data.groupColors,
+        };
+      }
+      return list;
+    })
+    .finally(() => assembleePeriodPromises.delete(periodId));
+  assembleePeriodPromises.set(periodId, promise);
+  return promise;
+}
+
+async function applyAssembleePeriod(periodId, { remountHeader = true, quiet = false } = {}) {
+  if (!assembleePayload) return;
+  const periods = fittedAssembleePeriods();
+  const period =
+    periods.find((p) => p.id === periodId) || periods[periods.length - 1];
+  if (!period) return;
+  const loadToken = ++periodLoadToken;
+  const periodDeputies = await loadDeputiesPeriod(period.id);
+  if (chamberId !== 'assemblee' || loadToken !== periodLoadToken) return;
+  currentPeriodId = period.id;
+  const fullList = periodDeputies.map(normalizeSenator);
+  if (assembleePayload.groupColors) groupColors = assembleePayload.groupColors;
+  /* Fixed 577-seat hemicycle — never rebuild just because headcount differs. */
+  ensureChamberSeatLayout();
+  const meta = {
+    ...(assembleePayload.meta || {}),
+    count: fullList.length,
+    period,
+    chamber: 'assemblee',
+  };
+  applySenatorData(fullList, meta, 'file', { quiet });
+  paintIntroIdeal(fullList, groupColors);
+  syncPeriodSliderUI();
+  if (remountHeader) updateChamberChrome();
+  closePanel();
+  hideTooltip();
+  if (!quiet) {
+    const seated = seatSystem.seats.filter((s) => s.senator).length;
+    console.info(
+      `AN ${period.id}: ${fullList.length} députés (Ideal) → ${seated} placés / ${seatSystem.seats.length} sièges`
+    );
+  }
+}
+
+function updateChamberChrome() {
+  const title = document.querySelector('.header-brand h1');
+  const eyebrow = document.querySelector('.header-brand .eyebrow');
+  const seatsMeta = document.querySelector('.header-meta [data-i18n="header.metaSeats"]');
+  const searchLabel = document.querySelector('label[for="senator-search-input"]');
+  const searchInput = document.getElementById('senator-search-input');
+  const idealSub = document.querySelector('.ideal-card-sub');
+  const idealScatterEl = document.getElementById('ideal-scatter');
+  const coachTitle = document.querySelector('#scene-coach [data-i18n="coach.title"]');
+  const aboutLinks = document.querySelectorAll('a.about-link, a.intro-about');
+  const aboutHref = chamberId === 'assemblee' ? '/about-assemblee.html' : '/about.html';
+
+  aboutLinks.forEach((a) => {
+    a.setAttribute('href', aboutHref);
+  });
+
+  if (chamberId === 'assemblee') {
+    if (title) {
+      title.removeAttribute('data-i18n-html');
+      title.innerHTML = t('header.titleAn');
+    }
+    if (eyebrow) {
+      eyebrow.removeAttribute('data-i18n');
+      eyebrow.textContent = t('header.eyebrowAn');
+    }
+    if (seatsMeta) {
+      seatsMeta.removeAttribute('data-i18n');
+      seatsMeta.textContent = t('header.metaSeatsAn');
+    }
+    if (searchLabel) {
+      searchLabel.removeAttribute('data-i18n');
+      searchLabel.textContent = t('search.labelAn');
+    }
+    if (searchInput) {
+      searchInput.setAttribute('data-i18n-placeholder', 'search.placeholderAn');
+      searchInput.placeholder = t('search.placeholderAn');
+    }
+    if (idealSub) {
+      idealSub.removeAttribute('data-i18n');
+      idealSub.textContent = t('panel.idealSubAn');
+    }
+    if (idealScatterEl) {
+      idealScatterEl.removeAttribute('data-i18n-aria');
+      idealScatterEl.setAttribute('aria-label', t('panel.scatterAriaAn'));
+    }
+    if (coachTitle) {
+      coachTitle.removeAttribute('data-i18n');
+      coachTitle.textContent = t('coach.titleAn');
+    }
+  } else {
+    if (title) {
+      title.setAttribute('data-i18n-html', 'header.title');
+      title.innerHTML = t('header.title');
+    }
+    if (eyebrow) {
+      eyebrow.setAttribute('data-i18n', 'header.eyebrow');
+      eyebrow.textContent = t('header.eyebrow');
+    }
+    if (seatsMeta) {
+      seatsMeta.setAttribute('data-i18n', 'header.metaSeats');
+      seatsMeta.textContent = t('header.metaSeats');
+    }
+    if (searchLabel) {
+      searchLabel.setAttribute('data-i18n', 'search.label');
+      searchLabel.textContent = t('search.label');
+    }
+    if (searchInput) {
+      searchInput.setAttribute('data-i18n-placeholder', 'search.placeholder');
+      searchInput.placeholder = t('search.placeholder');
+    }
+    if (idealSub) {
+      idealSub.setAttribute('data-i18n', 'panel.idealSub');
+      idealSub.textContent = t('panel.idealSub');
+    }
+    if (idealScatterEl) {
+      idealScatterEl.setAttribute('data-i18n-aria', 'panel.scatterAria');
+      idealScatterEl.setAttribute('aria-label', t('panel.scatterAria'));
+    }
+    if (coachTitle) {
+      coachTitle.setAttribute('data-i18n', 'coach.title');
+      coachTitle.textContent = t('coach.title');
+    }
+  }
+}
+
+async function loadChamberData() {
+  updateChamberChrome();
+  closePanel();
+  hideTooltip();
+  hoveredSeat = -1;
+  selectedSeat = -1;
+
+  if (chamberId === 'assemblee') {
+    const payload = await loadDeputiesPayload();
+    if (!payload) {
+      console.warn('deputies.json absent — fallback placeholders');
+      ensureChamberSeatLayout();
+      applySenatorData(
+        PLACEHOLDER_SENATORS.map(normalizeSenator),
+        { chamber: 'assemblee' },
+        'placeholder'
+      );
+      syncPeriodSliderUI();
+      return;
+    }
+    assembleePayload = payload;
+    const periods = fittedAssembleePeriods();
+    const want =
+      currentPeriodId && periods.some((p) => p.id === currentPeriodId)
+        ? currentPeriodId
+        : payload.meta?.defaultPeriod || periods[periods.length - 1]?.id;
+    await applyAssembleePeriod(want);
+    return;
+  }
+
+  /* Sénat */
+  syncPeriodSliderUI();
+  ensureChamberSeatLayout();
+  const { senators, source, meta, groupColors: gc } = await loadSenators();
+  if (gc && Object.keys(gc).length) groupColors = gc;
+  applySenatorData(senators, meta, source);
+  paintIntroIdeal(senators, groupColors);
+}
+
+let periodApplyTimer = 0;
+let periodPreviewId = null;
+
+function previewPeriodSlider(period, idx) {
+  const currentEl = document.getElementById('period-current');
+  const datesEl = document.getElementById('period-dates');
+  const ticks = document.getElementById('period-ticks');
+  if (currentEl) currentEl.textContent = periodDisplayLabel(period);
+  if (datesEl && period) {
+    const start = formatPeriodDate(period.start || period.dateMin, period.startLabel);
+    const end = period.end
+      ? formatPeriodDate(period.end, period.endLabel || '…')
+      : period.endLabel || '…';
+    datesEl.textContent = t('period.dates', { start, end });
+  }
+  if (ticks) {
+    ticks.querySelectorAll('.period-tick').forEach((el, i) => {
+      const active = i === idx;
+      el.classList.toggle('is-active', active);
+      el.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  }
+}
+
+async function commitAssembleePeriod(periodId) {
+  if (chamberId !== 'assemblee' || !assembleePayload) return;
+  if (periodId === currentPeriodId && seatSystem.seats.some((s) => s.senator)) {
+    syncPeriodSliderUI();
+    return;
+  }
+  await applyAssembleePeriod(periodId, { quiet: true });
+}
+
+document.getElementById('period-range')?.addEventListener('input', (event) => {
+  if (chamberId !== 'assemblee' || !assembleePayload) return;
+  const periods = fittedAssembleePeriods();
+  const idx = Number(event.target.value);
+  const period = periods[idx];
+  if (!period) return;
+  periodPreviewId = period.id;
+  previewPeriodSlider(period, idx);
+  window.clearTimeout(periodApplyTimer);
+  periodApplyTimer = window.setTimeout(() => {
+    commitAssembleePeriod(periodPreviewId).catch((err) => console.warn('Period load failed', err));
+  }, 70);
+});
+
+document.getElementById('period-range')?.addEventListener('change', (event) => {
+  if (chamberId !== 'assemblee' || !assembleePayload) return;
+  const periods = fittedAssembleePeriods();
+  const idx = Number(event.target.value);
+  const period = periods[idx];
+  if (!period) return;
+  window.clearTimeout(periodApplyTimer);
+  commitAssembleePeriod(period.id).catch((err) => console.warn('Period load failed', err));
+});
+
+document.getElementById('period-ticks')?.addEventListener('click', (event) => {
+  const tick = event.target.closest('[data-period-idx]');
+  if (!tick || chamberId !== 'assemblee') return;
+  const idx = Number(tick.getAttribute('data-period-idx'));
+  const periods = fittedAssembleePeriods();
+  const period = periods[idx];
+  const range = document.getElementById('period-range');
+  if (!period || !range) return;
+  range.value = String(idx);
+  window.clearTimeout(periodApplyTimer);
+  previewPeriodSlider(period, idx);
+  commitAssembleePeriod(period.id).catch((err) => console.warn('Period load failed', err));
+});
+
 applySeatColors(seatSystem.seats, seatSystem.colorMeshes);
 const PLACEHOLDER_SENATORS = [
   {
@@ -1544,28 +2224,21 @@ function normalizeSenator(raw) {
 async function loadSenators(retries = 6, delayMs = 300) {
   for (let i = 0; i < retries; i++) {
     try {
-      const res = await fetch(`${SENATORS_URL}?t=${Date.now()}`, { cache: 'no-store' });
-      if (res.ok) {
-        const ct = res.headers.get('content-type') || '';
-        if (!ct.includes('json')) {
-          await sleep(delayMs);
-          continue;
-        }
-        const data = await res.json();
-        const list = Array.isArray(data) ? data : data.senators;
-        if (Array.isArray(list) && list.length > 0) {
-          const senators = list.map(normalizeSenator);
-          const notebook = (data.meta && data.meta.notebook) || 'inconnu';
-          console.info(
-            `Sénateurs chargés: ${senators.length} depuis ${SENATORS_URL} (notebook: ${notebook})`
-          );
-          return {
-            senators,
-            source: 'file',
-            meta: data.meta || null,
-            groupColors: data.groupColors || {},
-          };
-        }
+      let data = await senatorPayloadPromise;
+      if (!data) data = await fetchCachedJson(SENATORS_URL);
+      const list = Array.isArray(data) ? data : data.senators;
+      if (Array.isArray(list) && list.length > 0) {
+        const senators = list.map(normalizeSenator);
+        const notebook = (data.meta && data.meta.notebook) || 'inconnu';
+        console.info(
+          `Sénateurs chargés: ${senators.length} depuis ${SENATORS_URL} (notebook: ${notebook})`
+        );
+        return {
+          senators,
+          source: 'file',
+          meta: data.meta || null,
+          groupColors: data.groupColors || {},
+        };
       }
     } catch {
       /* fichier pas encore prêt */
@@ -1821,7 +2494,7 @@ function mapSenatorsToSeats(senators, seats) {
   }
 
   const findBuval = () => seats.find((s) => s.senator && /Buval/i.test(s.senator.name || ''));
-  const buvalBeforeSeat = findBuval();
+  const buvalBeforeSeat = DEBUG_MAPPING ? findBuval() : null;
   const buvalBefore = buvalBeforeSeat
     ? {
         tier: buvalBeforeSeat.tier,
@@ -1831,16 +2504,18 @@ function mapSenatorsToSeats(senators, seats) {
       }
     : null;
 
-  const crossingsBefore = countIdealXAngleCrossings(seats);
-  const filledBefore = seats.filter((s) => s.senator);
-  const corrBefore = pearsonCorr(
-    filledBefore.map((s) => Number(s.senator.idealX) || 0),
-    filledBefore.map((s) => s.angle)
-  );
+  const crossingsBefore = DEBUG_MAPPING ? countIdealXAngleCrossings(seats) : null;
+  const filledBefore = DEBUG_MAPPING ? seats.filter((s) => s.senator) : [];
+  const corrBefore = DEBUG_MAPPING
+    ? pearsonCorr(
+        filledBefore.map((s) => Number(s.senator.idealX) || 0),
+        filledBefore.map((s) => s.angle)
+      )
+    : null;
 
   const relax = relaxYOutliers(seats, senators.slice(0, n), columnAngles);
 
-  const buvalAfterSeat = findBuval();
+  const buvalAfterSeat = DEBUG_MAPPING ? findBuval() : null;
   const buvalAfter = buvalAfterSeat
     ? {
         tier: buvalAfterSeat.tier,
@@ -1850,15 +2525,17 @@ function mapSenatorsToSeats(senators, seats) {
       }
     : null;
 
-  const filled = seats.filter((s) => s.senator);
-  const corrAfter = pearsonCorr(
-    filled.map((s) => Number(s.senator.idealX) || 0),
-    filled.map((s) => s.angle)
-  );
-  const crossingsAfter = countIdealXAngleCrossings(seats);
+  const filled = DEBUG_MAPPING ? seats.filter((s) => s.senator) : [];
+  const corrAfter = DEBUG_MAPPING
+    ? pearsonCorr(
+        filled.map((s) => Number(s.senator.idealX) || 0),
+        filled.map((s) => s.angle)
+      )
+    : null;
+  const crossingsAfter = DEBUG_MAPPING ? countIdealXAngleCrossings(seats) : null;
 
   const neighborIdealX = [];
-  if (buvalAfterSeat) {
+  if (DEBUG_MAPPING && buvalAfterSeat) {
     const col = buvalAfter.col;
     for (const s of seats) {
       if (!s.senator) continue;
@@ -1966,6 +2643,7 @@ function showSceneCoach(delay = 450) {
 const panelName = document.getElementById('panel-name');
 const panelParty = document.getElementById('panel-party');
 const panelIdentityMeta = document.getElementById('panel-identity-meta');
+const panelAvatar = document.getElementById('panel-avatar');
 const panelMetrics = document.getElementById('panel-metrics');
 const panelFields = document.getElementById('panel-fields');
 const panelClose = document.getElementById('panel-close');
@@ -1977,8 +2655,6 @@ const pointer = new THREE.Vector2();
 let hoveredSeat = -1;
 let selectedSeat = -1;
 let pointerDown = null;
-let allSenators = [];
-let groupColors = {};
 
 function formatPct(v) {
   const n = Number(v);
@@ -2180,7 +2856,7 @@ function buildBoxPlotSVG(
       : `<circle cx="${xs.toFixed(1)}" cy="23" r="5" class="boxplot-selected"/>`;
 
   const title = t('chart.distribution', { label });
-  const desc = t('chart.distributionDesc', {
+  const desc = tForChamber(chamberId, 'chart.distributionDesc', {
     value: formatAxisValue(m, digits, suffix),
   });
 
@@ -2200,8 +2876,8 @@ function buildBoxPlotSVG(
       <text x="${right}" y="78" text-anchor="end" class="boxplot-axis">P95 · ${svgEscape(formatAxisValue(p95, digits, suffix))}</text>
     </svg>
     <div class="metric-legend" aria-hidden="true">
-      <span><i class="legend-selected"></i>${t('chart.senator')}</span>
-      <span><i class="legend-senate"></i>${t('chart.senateMedian')}</span>
+      <span><i class="legend-selected"></i>${tForChamber(chamberId, 'chart.senator')}</span>
+      <span><i class="legend-senate"></i>${tForChamber(chamberId, 'chart.senateMedian')}</span>
       ${xg == null ? '' : `<span><i class="legend-group"></i>${t('chart.groupMedian')}</span>`}
     </div>
   </div>`;
@@ -2325,6 +3001,21 @@ function openPanel(senator) {
   panelParty.textContent = partyDisplay(senator);
   panelParty.style.color = senator.partyColor || '#c9a27a';
 
+  if (panelAvatar) {
+    if (senator.avatar) {
+      panelAvatar.hidden = false;
+      panelAvatar.alt = senator.name || '';
+      panelAvatar.src = senator.avatar;
+      panelAvatar.onerror = () => {
+        panelAvatar.hidden = true;
+        panelAvatar.removeAttribute('src');
+      };
+    } else {
+      panelAvatar.hidden = true;
+      panelAvatar.removeAttribute('src');
+    }
+  }
+
   const coords = `Ideal X ${formatNum(senator.idealX)} · Y ${formatNum(senator.idealY)}`;
   const circ = senator.circonscription ? String(senator.circonscription) : '';
   if (panelIdentityMeta) {
@@ -2336,7 +3027,7 @@ function openPanel(senator) {
 
   cards.push(`<div class="panel-metrics-heading">
     <p class="panel-metrics-title">${t('panel.comparisons')}</p>
-    <p>${t('panel.comparisonSub')}</p>
+    <p>${tForChamber(chamberId, 'panel.comparisonSub')}</p>
   </div>`);
 
   /* Abstention */
@@ -2362,7 +3053,7 @@ function openPanel(senator) {
         valueHtml: svgEscape(formatPct(cmp.abst)),
         percentile: p,
         assessment,
-        readout: t('metric.abstentionReadout', {
+        readout: tForChamber(chamberId, 'metric.abstentionReadout', {
           pct: r.pctLessExtreme,
           groupBit,
         }),
@@ -2372,7 +3063,7 @@ function openPanel(senator) {
           digits: 1,
           suffix: ' %',
         }),
-        hint: t('metric.abstentionHint'),
+        hint: tForChamber(chamberId, 'metric.abstentionHint'),
       })
     );
   }
@@ -2400,7 +3091,7 @@ function openPanel(senator) {
         valueHtml: svgEscape(formatNum(cmp.dist, 3)),
         percentile: p,
         assessment,
-        readout: t('metric.distReadout', {
+        readout: tForChamber(chamberId, 'metric.distReadout', {
           pct: r.pctLessExtreme,
           groupBit,
         }),
@@ -2409,7 +3100,7 @@ function openPanel(senator) {
           label: t('metric.distGroup').toLocaleLowerCase(localeTag()),
           digits: 3,
         }),
-        hint: t('metric.distHint'),
+        hint: tForChamber(chamberId, 'metric.distHint'),
       })
     );
   }
@@ -2437,7 +3128,7 @@ function openPanel(senator) {
         valueHtml: svgEscape(formatPct(cmp.loyalty)),
         percentile: p,
         assessment,
-        readout: t('metric.loyaltyReadout', {
+        readout: tForChamber(chamberId, 'metric.loyaltyReadout', {
           pct: r.pctMoreExtreme,
           groupBit,
         }),
@@ -2455,7 +3146,7 @@ function openPanel(senator) {
       metricCardHTML({
         label: t('metric.loyalty'),
         valueHtml: '—',
-        readout: t('metric.loyaltyMissing'),
+        readout: tForChamber(chamberId, 'metric.loyaltyMissing'),
         hint: t('metric.loyaltyMissingHint'),
       })
     );
@@ -2486,7 +3177,7 @@ function openPanel(senator) {
           label: t('metric.seatGap').toLocaleLowerCase(localeTag()),
           digits: 2,
         }),
-        hint: t('metric.seatGapHint', { n: target.n }),
+        hint: tForChamber(chamberId, 'metric.seatGapHint', { n: target.n }),
       })
     );
   }
@@ -2494,6 +3185,9 @@ function openPanel(senator) {
   if (panelMetrics) panelMetrics.innerHTML = cards.join('');
 
   const rows = [];
+  if (senator.circonscription) {
+    rows.push([t('field.circonscription'), svgEscape(String(senator.circonscription))]);
+  }
   if (senator.siege != null) rows.push([t('field.officialSeat'), String(senator.siege)]);
   else if (senator.siegeOfficiel != null) rows.push([t('field.officialSeat'), String(senator.siegeOfficiel)]);
   if (senator.idealRankLeftToRight != null) {
@@ -2502,10 +3196,17 @@ function openPanel(senator) {
   if (senator.idealImputed === true) rows.push([t('field.idealImputed'), t('field.idealImputedYes')]);
   if (senator.nonVotingPct != null) rows.push([t('field.nonVoting'), formatPct(senator.nonVotingPct)]);
   if (senator.url) {
-    rows.push([
-      t('field.senatePage'),
-      `<a href="${svgEscape(senator.url)}" target="_blank" rel="noopener noreferrer" style="color:#e8c49a">senat.fr</a>`,
-    ]);
+    if (chamberId === 'assemblee' || /assemblee-nationale/i.test(senator.url)) {
+      rows.push([
+        t('field.assembleePage'),
+        `<a href="${svgEscape(senator.url)}" target="_blank" rel="noopener noreferrer">assemblee-nationale.fr</a>`,
+      ]);
+    } else {
+      rows.push([
+        t('field.senatePage'),
+        `<a href="${svgEscape(senator.url)}" target="_blank" rel="noopener noreferrer">senat.fr</a>`,
+      ]);
+    }
   }
 
   panelFields.innerHTML = rows
@@ -2660,6 +3361,10 @@ const searchResultsEl = document.getElementById('senator-search-results');
 let searchMatches = [];
 let searchActiveIndex = 0;
 
+function setSearchUiOpen(open) {
+  document.body.classList.toggle('search-open', Boolean(open));
+}
+
 /* Keep iOS from page-zooming while users interact with search or senator cards. */
 for (const surface of [searchRoot, panelEl]) {
   surface?.addEventListener('gesturestart', (event) => event.preventDefault(), { passive: false });
@@ -2669,11 +3374,15 @@ for (const surface of [searchRoot, panelEl]) {
 }
 
 function closeSenatorSearchDropdown() {
-  if (!searchResultsEl || searchResultsEl.hidden) return false;
+  if (!searchResultsEl || searchResultsEl.hidden) {
+    setSearchUiOpen(false);
+    return false;
+  }
   searchResultsEl.hidden = true;
   searchResultsEl.innerHTML = '';
   searchMatches = [];
   searchActiveIndex = 0;
+  setSearchUiOpen(false);
   if (searchInput) searchInput.setAttribute('aria-expanded', 'false');
   return true;
 }
@@ -2690,8 +3399,9 @@ function renderSenatorSearchResults(matches, query) {
 
   if (!matches.length) {
     searchResultsEl.innerHTML =
-      `<li class="senator-search-empty" role="presentation">${t('search.empty')}</li>`;
+      `<li class="senator-search-empty" role="presentation">${tForChamber(chamberId, 'search.empty')}</li>`;
     searchResultsEl.hidden = false;
+    setSearchUiOpen(true);
     searchInput.setAttribute('aria-expanded', 'true');
     return;
   }
@@ -2711,6 +3421,7 @@ function renderSenatorSearchResults(matches, query) {
     })
     .join('');
   searchResultsEl.hidden = false;
+  setSearchUiOpen(true);
   searchInput.setAttribute('aria-expanded', 'true');
 }
 
@@ -2798,12 +3509,38 @@ document.addEventListener('keydown', (e) => {
   closePanel();
 });
 
-function applySenatorData(senators, meta, source) {
+function applySenatorData(senators, meta, source, { quiet = false } = {}) {
   allSenators = senators;
-  const mapStats = mapSenatorsToSeats(senators, seatSystem.seats);
+  ensureChamberSeatLayout();
+  const seated = selectLegislatorsForSeats(senators, seatSystem.seats.length);
+  const mapStats = mapSenatorsToSeats(seated, seatSystem.seats);
   refreshSeatColors();
   const filled = seatSystem.seats.filter((s) => s.senator).length;
-  console.info(`Sièges colorés: ${filled}/${seatSystem.seats.length} (${source})`);
+  if (!quiet) {
+    console.info(`Sièges colorés: ${filled}/${seatSystem.seats.length} (${source})`);
+  }
+
+  const hint = document.querySelector('.hint');
+  if (hint && source === 'file') {
+    const n = meta?.count || meta?.n_senators || filled;
+    const nb = meta?.notebook ? ` · ${meta.notebook}` : '';
+    hint.dataset.hintMode = chamberId === 'assemblee' ? 'loadedAn' : 'loaded';
+    hint.dataset.hintN = String(n);
+    hint.dataset.hintNb = nb;
+    hint.dataset.hintLabel = meta?.period?.label || meta?.period?.id || '';
+    hint.removeAttribute('data-i18n');
+    if (chamberId === 'assemblee' && meta?.period) {
+      hint.textContent = t('header.hintLoadedAn', {
+        n,
+        label: meta.period.label || meta.period.id,
+        nb: '',
+      });
+    } else {
+      hint.textContent = t('header.hintLoaded', { n, nb });
+    }
+  }
+
+  if (quiet || !mapStats || !DEBUG_MAPPING) return;
 
   /* Vérif : monotonie X inter-colonnes ; Y bas < haut ; UMP extrêmes */
   const mean = (arr, fn) => (arr.length ? arr.reduce((a, s) => a + fn(s), 0) / arr.length : NaN);
@@ -2811,36 +3548,12 @@ function applySenatorData(senators, meta, source) {
   const columnAngles = hemicycleColumnAngles();
   const colOf = (s) => seatColumnIndex(s.angle, columnAngles);
 
-  if (mapStats) {
-    console.info(
-      `Relaxation Y: ${mapStats.swaps} swap(s) · corr(idealX,angle) ${fmt(mapStats.corrBefore)} → ${fmt(
-        mapStats.corrAfter
-      )} · crossings ${mapStats.crossingsBefore} → ${mapStats.crossingsAfter}`
-    );
-    if (mapStats.buvalBefore && mapStats.buvalAfter) {
-      const tb = mapStats.targetTier?.(
-        seatSystem.seats.find((s) => s.senator && /Buval/i.test(s.senator.name || ''))?.senator
-      );
-      console.info(
-        `Frédéric Buval: tier ${mapStats.buvalBefore.tier} (col ${mapStats.buvalBefore.col}) → ` +
-          `tier ${mapStats.buvalAfter.tier} (col ${mapStats.buvalAfter.col})` +
-          (Number.isFinite(tb) ? ` · targetY=${tb}` : '') +
-          ` · idealX=${fmt(mapStats.buvalAfter.idealX)} idealY=${fmt(mapStats.buvalAfter.idealY)}`
-      );
-      if (mapStats.neighborIdealX?.length) {
-        console.info(
-          `  voisins Ideal X: ${mapStats.neighborIdealX
-            .map(
-              (n) =>
-                `${n.name.split(' ').pop()}(t${n.tier}/c${n.col} X=${fmt(n.idealX)})`
-            )
-            .join(' · ')}`
-        );
-      }
-    }
-  }
+  console.info(
+    `Relaxation Y: ${mapStats.swaps} swap(s) · corr(idealX,angle) ${fmt(mapStats.corrBefore)} → ${fmt(
+      mapStats.corrAfter
+    )} · crossings ${mapStats.crossingsBefore} → ${mapStats.crossingsAfter}`
+  );
 
-  /* Gauche→droite = colonnes radiales (pas le micro-angle intra-colonne) */
   const byVisual = [...seatSystem.seats]
     .filter((s) => s.senator)
     .sort((a, b) => colOf(a) - colOf(b) || a.tier - b.tier);
@@ -2871,12 +3584,6 @@ function applySenatorData(senators, meta, source) {
   console.info(
     `Prio Y (mean idealY / tier 0→${SEATS_PER_TIER.length - 1}): ${tierMeansY.map(fmt).join(' · ')}`
   );
-  console.info(
-    `  bas tiers 0–2 meanY=${fmt(mean(byTier.slice(0, 3).flat(), (s) => Number(s.senator.idealY) || 0))} · ` +
-      `haut tiers ${SEATS_PER_TIER.length - 3}–${SEATS_PER_TIER.length - 1} meanY=${fmt(
-        mean(byTier.slice(-3).flat(), (s) => Number(s.senator.idealY) || 0)
-      )}`
-  );
 
   const leftSeats = seatSystem.seats.filter((s) => s.senator && Number(s.senator.idealX) < -0.3);
   const rightSeats = seatSystem.seats.filter((s) => s.senator && Number(s.senator.idealX) > 0.2);
@@ -2885,113 +3592,25 @@ function applySenatorData(senators, meta, source) {
   );
   const crcSeats = seatSystem.seats.filter((s) => s.senator && s.senator.party === 'CRC');
   const umpSeats = seatSystem.seats.filter((s) => s.senator && s.senator.party === 'UMP');
-
-  /* UMP : colonne la plus à gauche/droite === min/max idealX */
-  const umpByVisual = [...umpSeats].sort(
-    (a, b) => colOf(a) - colOf(b) || a.tier - b.tier
-  );
-  const umpLeftSeat = umpByVisual[0];
-  const umpRightSeat = umpByVisual[umpByVisual.length - 1];
-  const umpIdealKey = (s) => [Number(s.idealX) || 0, Number(s.idealY) || 0];
-  let umpMinIdeal = null;
-  let umpMaxIdeal = null;
-  for (const s of senators) {
-    if (s.party !== 'UMP') continue;
-    const [x, y] = umpIdealKey(s);
-    if (
-      !umpMinIdeal ||
-      x < Number(umpMinIdeal.idealX) ||
-      (x === Number(umpMinIdeal.idealX) && y < Number(umpMinIdeal.idealY))
-    ) {
-      umpMinIdeal = s;
-    }
-    if (
-      !umpMaxIdeal ||
-      x > Number(umpMaxIdeal.idealX) ||
-      (x === Number(umpMaxIdeal.idealX) && y > Number(umpMaxIdeal.idealY))
-    ) {
-      umpMaxIdeal = s;
-    }
-  }
-  const leftUmpOk =
-    umpLeftSeat && umpMinIdeal && umpLeftSeat.senator === umpMinIdeal;
-  const umpMaxSeat = umpSeats.find((s) => s.senator === umpMaxIdeal);
-  const rightUmpOk =
-    umpRightSeat &&
-    umpMaxSeat &&
-    colOf(umpRightSeat) === colOf(umpMaxSeat);
-  console.info(
-    `UMP extrêmes: gauche siège=${umpLeftSeat?.senator?.name || 'n/a'} (idealX=${fmt(
-      Number(umpLeftSeat?.senator?.idealX)
-    )}) === minIdeal=${umpMinIdeal?.name || 'n/a'} (${fmt(Number(umpMinIdeal?.idealX))}) → ${
-      leftUmpOk ? 'OK' : 'FAIL'
-    }`
-  );
-  console.info(
-    `UMP extrêmes: droite colonne=${umpRightSeat ? colOf(umpRightSeat) : 'n/a'} contient maxIdeal=${
-      umpMaxIdeal?.name || 'n/a'
-    } (${fmt(Number(umpMaxIdeal?.idealX))}) → ${rightUmpOk ? 'OK' : 'FAIL'}`
-  );
-
   console.info(
     `Orient. X: CRC meanAngle=${fmt(mean(crcSeats, (s) => s.angle))} · UMP meanAngle=${fmt(mean(umpSeats, (s) => s.angle))} · ` +
-      `gauche ideal meanWorldX=${fmt(mean(leftSeats, (s) => s.x))} · droite ideal meanWorldX=${fmt(mean(rightSeats, (s) => s.x))} ` +
-      `(CRC gauche / UMP droite attendu)`
+      `gauche ideal meanWorldX=${fmt(mean(leftSeats, (s) => s.x))} · droite ideal meanWorldX=${fmt(mean(rightSeats, (s) => s.x))}`
   );
   console.info(
-    `Orient. Y: RDPI meanTier=${fmt(mean(rdpiSeats, (s) => s.tier))} / max=${SEATS_PER_TIER.length - 1} (attendu haut/loin)`
+    `Orient. Y: RDPI meanTier=${fmt(mean(rdpiSeats, (s) => s.tier))} / max=${SEATS_PER_TIER.length - 1}`
   );
-
-  const hint = document.querySelector('.hint');
-  if (hint && source === 'file') {
-    const n = meta?.count || meta?.n_senators || filled;
-    const nb = meta?.notebook ? ` · ${meta.notebook}` : '';
-    hint.dataset.hintMode = 'loaded';
-    hint.dataset.hintN = String(n);
-    hint.dataset.hintNb = nb;
-    hint.removeAttribute('data-i18n');
-    hint.textContent = t('header.hintLoaded', { n, nb });
-  }
 }
 
-loadSenators().then(({ senators, source, meta, groupColors: gc }) => {
-  if (gc && Object.keys(gc).length) groupColors = gc;
-  applySenatorData(senators, meta, source);
-  paintIntroIdeal(senators, groupColors);
-
-  if (source === 'placeholder') {
-    const hint = document.querySelector('.hint');
-    if (hint) {
-      hint.dataset.hintMode = 'placeholder';
-      hint.removeAttribute('data-i18n');
-      hint.textContent = t('header.hintPlaceholder');
-    }
-    const poll = setInterval(async () => {
-      try {
-        const res = await fetch(`${SENATORS_URL}?t=${Date.now()}`, { cache: 'no-store' });
-        if (!res.ok) return;
-        const ct = res.headers.get('content-type') || '';
-        if (!ct.includes('json')) return;
-        const data = await res.json();
-        const list = Array.isArray(data) ? data : data.senators;
-        if (!Array.isArray(list) || list.length < 4) return;
-        clearInterval(poll);
-        if (data.groupColors) groupColors = data.groupColors;
-        const normalized = list.map(normalizeSenator);
-        applySenatorData(normalized, data.meta || null, 'file');
-        paintIntroIdeal(normalized, groupColors);
-        closePanel();
-        hideTooltip();
-        console.info(`Sénateurs mis à jour: ${list.length}`);
-      } catch {
-        /* encore absent */
-      }
-    }, 2000);
-  }
+loadChamberData().then(() => {
+  showSceneCoach();
+}).catch((err) => {
+  console.warn('loadChamberData failed', err);
 });
 
 /* Debug / smoke-test helpers */
 window.__hemicycle = {
+  chamber: () => chamberId,
+  period: () => currentPeriodId,
   seatCount: () => seatSystem.seats.length,
   filledCount: () => seatSystem.seats.filter((s) => s.senator).length,
   seats: () => seatSystem.seats,
@@ -3065,11 +3684,15 @@ window.addEventListener('resize', () => {
 });
 
 let lastBackgroundRender = 0;
+let lastMobileRender = 0;
 
 function animate(frameTime = performance.now()) {
   requestAnimationFrame(animate);
+  if (document.hidden) return;
   if (BACKGROUND_MODE && frameTime - lastBackgroundRender < 33) return;
   if (BACKGROUND_MODE) lastBackgroundRender = frameTime;
+  if (IS_MOBILE_DEVICE && frameTime - lastMobileRender < 33) return;
+  if (IS_MOBILE_DEVICE) lastMobileRender = frameTime;
   const now = performance.now();
   if (autoOrbit) {
     senatorOrbitPose(now, _orbitDesiredCam, _orbitDesiredLook);
@@ -3166,13 +3789,6 @@ function paintIntroIdeal(senators, colors = {}) {
     showSceneCoach(520);
   };
 
-  /* Load scatter ASAP (don’t wait for seat mapping) so the intro isn’t blank. */
-  loadScatterSenators('/assets/senators.json')
-    .then(({ senators, groupColors: gc }) => {
-      paintIntroIdeal(senators, gc || groupColors);
-    })
-    .catch((err) => console.warn('Intro Ideal Point:', err));
-
   enterBtn?.addEventListener('click', dismiss);
   skipBtn?.addEventListener('click', dismiss);
   introAutoDismissTimer = window.setTimeout(dismiss, 15000);
@@ -3186,7 +3802,13 @@ function refreshDynamicHint() {
   const hint = document.querySelector('.hint');
   if (!hint) return;
   const mode = hint.dataset.hintMode;
-  if (mode === 'loaded') {
+  if (mode === 'loadedAn') {
+    hint.textContent = t('header.hintLoadedAn', {
+      n: hint.dataset.hintN || '',
+      label: hint.dataset.hintLabel || '',
+      nb: '',
+    });
+  } else if (mode === 'loaded') {
     hint.textContent = t('header.hintLoaded', {
       n: hint.dataset.hintN || '',
       nb: hint.dataset.hintNb || '',
@@ -3197,6 +3819,8 @@ function refreshDynamicHint() {
 }
 
 onLangChange(() => {
+  updateChamberChrome();
+  syncPeriodSliderUI();
   refreshDynamicHint();
   if (!panelEl.hidden && selectedSeat >= 0) {
     const sen = seatSystem.seats[selectedSeat]?.senator;

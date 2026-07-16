@@ -1,0 +1,10 @@
+{
+  "legislature": "15",
+  "active_deputes": 651,
+  "model_deputes": 640,
+  "model_roll_calls": 3466,
+  "model_rows": 357483,
+  "dim1_multiplier": 0.8874522077740185,
+  "dim2_multiplier": 1.0,
+  "model": "pscl::ideal d=2 seed=123 maxiter=1000 burnin=500 thin=25 impute=FALSE"
+}

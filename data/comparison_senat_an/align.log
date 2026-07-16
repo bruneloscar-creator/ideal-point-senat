@@ -1,0 +1,33 @@
+{
+  "n_bridges": 17,
+  "scale": 1.1404876312232668,
+  "translation": [
+    -0.15539140108094535,
+    0.1624453996117059
+  ],
+  "rotation": [
+    [
+      0.8159690205049178,
+      -0.5780956301307293
+    ],
+    [
+      0.5780956301307292,
+      0.8159690205049177
+    ]
+  ],
+  "rmse": 0.2650683936557803,
+  "corr_dim1": 0.8936380751494136,
+  "corr_dim2": -0.025133830926584697,
+  "singular_values": [
+    4.691566103286721,
+    0.0370998891565699
+  ],
+  "loo_rmse": 0.2985640922693198,
+  "legislature": "14",
+  "coords": "raw",
+  "method": "Similarity Procrustes (translation + isotropic scale + orthogonal rotation/reflection) mapping AN \u2192 Senate space using bridge MPs"
+}
+Chosen AN législature for bridging: 14 (17 bridge legislators in both ideal models).
+Similarity Procrustes map AN→Senate: scale=1.140, RMSE=0.265, LOO-RMSE=0.299, corr(dim1)=0.894, corr(dim2)=-0.025.
+Dimension 1 is meaningfully shared across chambers for bridge MPs (left–right ordering is comparable after alignment).
+Among bridges, mean dim1(right-like senat groups) − dim1(left-like) = 1.027 in Senate and 0.592 after AN map.
